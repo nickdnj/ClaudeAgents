@@ -6,8 +6,8 @@ The Manager Agent orchestrates the Claude Code agent infrastructure. It discover
 
 ## Core Responsibilities
 
-1. **Agent Discovery & Loading** - Find and cache task agents from Google Drive
-2. **Cache Management** - Keep local copies synchronized with Drive
+1. **Agent Discovery & Loading** - Find task agents from the local repository
+2. **GitHub Sync** - Check for and pull updates from GitHub on startup
 3. **Interactive Interface** - Present menus and understand natural language
 4. **Workflow Orchestration** - Manage draft → publish → release lifecycle
 5. **Version Control** - Auto-increment versions and update document headers
@@ -16,38 +16,45 @@ The Manager Agent orchestrates the Claude Code agent infrastructure. It discover
 
 ## Startup Sequence
 
-### 1. Initialize Connection
-- Connect to Google Drive via MCP
-- Load Manager configuration from `Claude Agents/Manager/config.json`
-
-### 2. Check for Updates
-- Scan `Claude Agents/` folder in Google Drive
-- Compare with local cache in `~/.claude-code/cache/`
-- Identify:
-  - Modified agent configurations (SKILL.md or config.json changed)
-  - New agents (folders not in cache)
-  - Deleted agents (in cache but not in Drive)
-
-### 3. Prompt for Cache Update
-If changes detected:
+### 1. Check GitHub for Updates
+Run `git fetch` to check for remote changes without modifying local files:
+```bash
+git fetch origin main
 ```
-⚠️  Changes detected in Claude Agents/:
-  • Manager: SKILL.md modified 1 day ago
-  • Monthly Bulletin: config.json modified 2 hours ago
-  • New agent found: Community Presentation
 
-Update local cache? (y/n):
+Compare local HEAD with remote:
+```bash
+git log HEAD..origin/main --oneline
+```
+
+### 2. Display Update Status
+If updates are available:
+```
+🔄 Updates available from GitHub:
+  • ce8d2e5 Add Presentation agent for PowerPoint creation
+  • ab12cd3 Update Monthly Bulletin styling
+
+Pull updates? (y/n):
 ```
 
 If user says yes:
-- Download updated SKILL.md and config.json files
-- Update cache metadata (timestamps, checksums)
-- Cache new agents
-- Remove deleted agents from cache
+- Run `git pull origin main`
+- Check if Manager/SKILL.md was modified
+- If Manager was updated, prompt for restart:
+  ```
+  ⚠️  Manager agent was updated. Please restart Claude Code to load the new configuration.
+  ```
+- If only other agents updated, continue with new configurations
 
 If user says no:
-- Proceed with cached versions
+- Proceed with current local versions
 - Display warning that working with potentially outdated configurations
+
+### 3. Discover Local Agents
+Scan the repository root for agent folders:
+- Each subfolder with both `SKILL.md` and `config.json` is a valid agent
+- Skip `Manager/` folder (that's this agent)
+- Skip hidden folders (starting with `.`)
 
 ### 4. Present Agent Selection Menu
 Display interactive menu with available agents:
@@ -64,7 +71,7 @@ Show agent names from their config.json "name" field.
 
 ### 5. Load Selected Agent
 Once user selects an agent:
-- Load the agent's SKILL.md and config.json from cache
+- Load the agent's SKILL.md and config.json from the local repository
 - Connect to MCP servers specified in the agent's config
 - Read the agent's current working document to determine status
 - Present agent context and available actions
@@ -72,9 +79,19 @@ Once user selects an agent:
 ## Agent Discovery
 
 ### Valid Agent Detection
-A folder in `Claude Agents/` is a valid agent if it contains:
+A folder in the repository root is a valid agent if it contains:
 - `SKILL.md` file (agent-specific instructions)
 - `config.json` file (agent configuration)
+
+### Repository Structure
+```
+ClaudeAgents/
+├── Manager/           # This agent (skip in discovery)
+├── Monthly Bulletin/  # Valid agent
+├── Presentation/      # Valid agent
+├── proposal-review/   # Valid agent
+└── ...
+```
 
 ### Special Cases
 - `Manager/` folder contains the Manager Agent itself (this skill)
@@ -88,49 +105,20 @@ For each discovered agent, extract from config.json:
 - `mcp_servers` - Required MCP servers
 - Other configuration as needed
 
-## Cache Management
+## Git-Based Updates
 
-### Cache Structure
-```
-~/.claude-code/
-  cache/
-    Manager/
-      SKILL.md
-      config.json
-      .metadata.json
-    monthly-bulletin/
-      SKILL.md
-      config.json
-      .metadata.json
-    community-presentation/
-      SKILL.md
-      config.json
-      .metadata.json
-```
+### Update Flow
+1. On startup, fetch from GitHub to check for changes
+2. If changes exist, show commit summary and prompt user
+3. If user approves, pull changes
+4. If Manager was modified, prompt for Claude restart
+5. Otherwise, reload affected agent configurations
 
-### Metadata File Format
-`.metadata.json` for each agent:
-```json
-{
-  "last_synced": "2026-02-05T09:15:00Z",
-  "drive_modified": "2026-02-04T14:30:00Z",
-  "skill_checksum": "abc123...",
-  "config_checksum": "def456...",
-  "drive_folder_id": "folder_id_here"
-}
-```
-
-### Update Detection
-Compare Drive file modification times with cached metadata:
-- If Drive version is newer → agent has updates
-- If checksums differ → content has changed
-- Prompt user before overwriting cache
-
-### Cache Invalidation
-Cache is session-specific:
-- Check for updates only on startup
-- Work with cached versions throughout the session
-- Mid-session Drive changes are not detected
+### No Caching Required
+Since agents are stored in the local git repository:
+- Always read directly from filesystem
+- Git handles version control and sync
+- No separate cache needed
 
 ## Agent Loading & Context
 
@@ -138,7 +126,7 @@ Cache is session-specific:
 When user selects an agent:
 
 1. **Read Configuration**
-   - Load cached SKILL.md into context
+   - Load SKILL.md from agent folder into context
    - Parse config.json for settings
 
 2. **Connect MCP Servers**
@@ -487,8 +475,9 @@ Not implemented in v1 - use separate terminals for now.
 
 The Manager Agent is working correctly when:
 
-✓ Discovers all valid agents in Claude Agents/ folder
-✓ Detects changes and prompts for cache updates
+✓ Discovers all valid agents in the repository
+✓ Checks GitHub for updates and prompts user appropriately
+✓ Prompts for restart when Manager itself is updated
 ✓ Presents clear, actionable menus
 ✓ Understands natural language requests appropriately
 ✓ Loads agent context and connects MCP servers reliably
@@ -505,7 +494,7 @@ This skill will evolve based on usage:
 - Add new workflow commands as needed
 - Refine natural language understanding
 - Enhance error messages based on user feedback
-- Optimize cache management strategies
+- Improve GitHub sync and update detection
 - Add agent creation/management commands
 
 The goal is a system that feels natural to use, handles the mechanics automatically, and stays out of the way while helping Nick work efficiently with his agents.
