@@ -74,15 +74,17 @@ Look for information related to:
 
 ## Bulletin Structure
 
-### Header Section (Masthead Design)
-The header uses a professional masthead design with integrated branding:
-- **Colored banner background** (gradient using primary color #1a5276)
-- **Logo on the left** - small, embedded inline with white background padding
-- **Title and subtitles on the right** in white text:
-  - Main title with seasonal emoji: "❄️ Wharfside Manor Community Bulletin"
-  - Month/Year and Association name on one line
-  - Tagline: "Keeping residents informed and connected throughout the season"
-  - Version indicator (e.g., "Draft v0.1")
+### Header Section (Nautical Masthead)
+The header uses a nautical-themed masthead reflecting Wharfside Manor's Monmouth Beach location:
+- **Wave pattern top border** (SVG wave in background color)
+- **Navy blue gradient background** (#1a3a5c to #2c5f7c)
+- **Centered logo** with gold border, white background padding, and shadow
+- **Title "Wharfside Manor"** in large serif font (Georgia)
+- **Anchor divider** (⚓ ⚓ ⚓)
+- **"Community Bulletin" subtitle** in italic
+- **Month badge** - gold pill-shaped badge with month/year
+- **Location tagline** - "Monmouth Beach, New Jersey"
+- **Wave pattern bottom** transitioning to white content area
 
 ### Community Message (Opening)
 Always include:
@@ -181,60 +183,74 @@ The examples represent the target quality and style - use them as your guide for
 - Include version in subject line: "[Month Year] Monthly Bulletin - Draft v0.X"
 - Send to: nickd@wharfsidemb.com
 
-**Logo Embedding (Base64):**
-Gmail strips external URLs and large base64 images. Use this approach:
-- Convert logo to JPEG, resize to ~150x100 pixels
-- Compress with quality 75, optimize=true
-- Base64 string must be under ~3000 characters to display inline
-- Embed using data URI: `src="data:image/jpeg;base64,{base64_string}"`
-- Logo file location: `/Users/nickd/Workspaces/ClaudeAgents/Wharfside_Logo.png`
-- In masthead, display at 80px width with white background padding
+**Logo Embedding (GitHub Hosted):**
+The logo is served from GitHub for reliable display across all email clients:
+- **Logo URL:** `https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo.png`
+- Display at 160px width in masthead
+- Style with white background padding, gold border (#c9a227), rounded corners
+- Add box shadow for depth
+- Local file: `/Users/nickd/Workspaces/ClaudeAgents/Wharfside_Logo.png`
 
-**HTML Template Structure:**
+**HTML Template Structure (Nautical Theme):**
 ```html
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; color: #333; line-height: 1.6; }
-    .masthead { background: linear-gradient(135deg, #1a5276 0%, #2874a6 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-    .title { font-size: 22px; font-weight: bold; margin: 0 0 5px 0; }
-    .subtitle { font-size: 13px; opacity: 0.9; margin: 3px 0; }
-    .version { font-size: 11px; opacity: 0.7; font-style: italic; margin-top: 8px; }
-    .section { margin: 25px 0; }
-    .section-header { font-size: 18px; color: #1a5276; border-bottom: 2px solid #1a5276; padding-bottom: 5px; margin-bottom: 15px; }
-    .emergency-box { background: #fef9e7; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; }
-    .highlight { background: #eaf2f8; padding: 15px; border-radius: 5px; margin: 15px 0; }
-    ul { padding-left: 20px; }
-    li { margin: 8px 0; }
-    .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #1a5276; color: #666; }
-    hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
-    strong { color: #1a5276; }
+    body { font-family: 'Georgia', serif; max-width: 720px; margin: 0 auto; padding: 20px; color: #2c3e50; line-height: 1.7; background: linear-gradient(180deg, #e8f4f8 0%, #d4e6ec 100%); }
+    .wrapper { background: white; border-radius: 0; box-shadow: 0 8px 30px rgba(0,0,0,0.15); overflow: hidden; border: 4px solid #1a3a5c; }
+
+    /* Nautical Masthead */
+    .masthead { background: linear-gradient(180deg, #1a3a5c 0%, #2c5f7c 100%); color: white; text-align: center; }
+    .wave-top { height: 20px; /* SVG wave pattern */ }
+    .logo { width: 160px; border-radius: 8px; background: white; padding: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 3px solid #c9a227; }
+    .title { font-family: 'Georgia', serif; font-size: 32px; font-weight: bold; }
+    .anchor-divider { font-size: 24px; margin: 10px 0; opacity: 0.7; } /* ⚓ ⚓ ⚓ */
+    .month-badge { background: #c9a227; color: #1a3a5c; padding: 10px 30px; border-radius: 30px; font-size: 18px; font-weight: bold; }
+    .wave-bottom { height: 40px; /* SVG wave pattern */ }
+
+    /* Content */
+    .content { padding: 25px 35px; }
+    .section-header { font-size: 22px; color: #1a3a5c; padding: 12px 20px; background: linear-gradient(90deg, #e8f4f8 0%, white 100%); border-left: 5px solid #c9a227; border-radius: 0 8px 8px 0; }
+    .welcome-box { background: linear-gradient(135deg, #f8f4e8 0%, #f0e8d8 100%); border: 2px solid #c9a227; border-radius: 12px; padding: 25px; }
+    .emergency-box { background: linear-gradient(135deg, #fef9e7 0%, #fcf3cf 100%); border: 2px solid #e74c3c; border-radius: 12px; padding: 20px; }
+    .highlight { background: linear-gradient(135deg, #e8f4f8 0%, #d5eef5 100%); border: 2px solid #5dade2; border-radius: 12px; padding: 20px; }
+    .highlight-gold { background: linear-gradient(135deg, #fef9e7 0%, #fdebd0 100%); border: 2px solid #c9a227; border-radius: 12px; padding: 20px; }
+    .pool-box { background: linear-gradient(135deg, #e8f8f5 0%, #d1f2eb 100%); border: 2px solid #1abc9c; border-radius: 12px; padding: 25px; text-align: center; }
+    .divider { /* Rope wave pattern */ margin: 35px 0; }
+
+    /* Footer */
+    .footer { text-align: center; padding: 30px; background: linear-gradient(180deg, #1a3a5c 0%, #0d2137 100%); color: white; }
+    .footer-anchor { font-size: 36px; } /* ⚓ */
+
+    strong { color: #1a3a5c; }
+    .gold { color: #c9a227; }
   </style>
 </head>
 <body>
-  <div class="masthead">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%">
-      <tr>
-        <td width="90" valign="middle">
-          <img src="data:image/jpeg;base64,{logo_base64}" alt="Wharfside Manor" style="width:80px;height:auto;border-radius:4px;background:white;padding:5px;">
-        </td>
-        <td valign="middle" style="padding-left:15px;">
-          <div class="title">{seasonal_emoji} Wharfside Manor Community Bulletin</div>
-          <div class="subtitle">{month} {year} | Wharfside Manor Condominium Association, Inc.</div>
-          <div class="subtitle">Keeping residents informed and connected throughout the season</div>
-          <div class="version">Draft v{version}</div>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <div class="wrapper">
+    <div class="masthead">
+      <div class="wave-top"></div>
+      <img src="https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo.png" alt="Wharfside Manor" class="logo">
+      <div class="title">Wharfside Manor</div>
+      <div class="anchor-divider">⚓ ⚓ ⚓</div>
+      <div class="subtitle">Community Bulletin</div>
+      <div class="month-badge">{month} {year}</div>
+      <div class="tagline">Monmouth Beach, New Jersey</div>
+      <div class="wave-bottom"></div>
+    </div>
 
-  <!-- Content sections go here -->
+    <div class="content">
+      <!-- Welcome box, emergency contacts, content sections -->
+    </div>
 
-  <div class="footer">
-    <p><strong>Warmly,</strong></p>
-    <p><strong>Wharfside Manor Board of Trustees</strong></p>
+    <div class="footer">
+      <div class="footer-anchor">⚓</div>
+      <p><strong>Warmly,</strong></p>
+      <p><strong>Wharfside Manor Board of Trustees</strong></p>
+      <p class="footer-tagline">Wharfside Manor Condominium Association, Inc. • Monmouth Beach, NJ</p>
+    </div>
   </div>
 </body>
 </html>

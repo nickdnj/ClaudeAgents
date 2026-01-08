@@ -1,7 +1,7 @@
 {
   "name": "monthly-bulletin",
-  "description": "Generates monthly community bulletin for Wharfside Manor as HTML email",
-  "version": "2.0",
+  "description": "Generates monthly community bulletin for Wharfside Manor as HTML email with nautical theme",
+  "version": "3.0",
 
   "mcp_servers": [
     "gmail"
@@ -19,10 +19,10 @@
   },
 
   "logo": {
-    "url": "https://drive.google.com/uc?export=view&id=LOGO_FILE_ID_HERE",
-    "alt_text": "Wharfside Manor Logo",
-    "width": "250px",
-    "note": "Replace LOGO_FILE_ID_HERE with the Google Drive file ID of the Wharfside logo"
+    "url": "https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo.png",
+    "alt_text": "Wharfside Manor",
+    "width": "160px",
+    "local_path": "Wharfside_Logo.png"
   },
 
   "email": {
@@ -55,12 +55,34 @@
     }
   },
 
+  "location": {
+    "name": "Wharfside Manor",
+    "city": "Monmouth Beach",
+    "state": "New Jersey",
+    "tagline": "Monmouth Beach, New Jersey"
+  },
+
   "styling": {
-    "primary_color": "#1a5276",
-    "accent_color": "#f39c12",
-    "background_highlight": "#eaf2f8",
-    "emergency_background": "#fef9e7",
-    "font_family": "Arial, sans-serif",
-    "max_width": "700px"
+    "theme": "nautical",
+    "font_family": "'Georgia', serif",
+    "max_width": "720px",
+    "colors": {
+      "navy_dark": "#1a3a5c",
+      "navy_light": "#2c5f7c",
+      "gold": "#c9a227",
+      "seafoam": "#e8f4f8",
+      "seafoam_dark": "#d4e6ec",
+      "ocean_blue": "#5dade2",
+      "teal": "#1abc9c",
+      "sand": "#f8f4e8",
+      "sand_dark": "#f0e8d8",
+      "coral": "#e74c3c",
+      "text_primary": "#2c3e50"
+    },
+    "decorative": {
+      "anchor_emoji": "⚓",
+      "wave_emoji": "🌊",
+      "divider": "⚓ ⚓ ⚓"
+    }
   }
 }
