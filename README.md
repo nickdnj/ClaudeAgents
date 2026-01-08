@@ -2,22 +2,40 @@
 
 A collection of AI-powered automation agents for Wharfside Manor Condominium Association, built on [Claude Code](https://claude.ai/code).
 
-![Wharfside Manor](Wharfside_Logo.png)
-
 ## Overview
 
-This repository contains Claude Code agent configurations (skills) that automate routine administrative tasks for a condominium association. Each agent is defined by a `SKILL.md` file (behavior instructions) and a `config.json` file (settings and MCP server dependencies).
+This repository contains Claude Code agent configurations (skills) that automate routine administrative tasks. Each agent is defined by a `SKILL.md` file (behavior instructions) and a `config.json` file (settings and MCP server dependencies).
 
 ## Agents
 
 | Agent | Description | Trigger |
 |-------|-------------|---------|
-| **Manager** | Orchestrates agent infrastructure, handles discovery and workflow lifecycle | On startup |
+| **Manager** | Orchestrates agent infrastructure, handles GitHub sync and workflow lifecycle | On startup |
 | **Monthly Bulletin** | Mines Gmail for updates, generates branded HTML community bulletins | Scheduled or on-demand |
 | **Presentation** | Creates PowerPoint presentations from content using branded templates | On-demand |
 | **Proposal Review** | Analyzes vendor proposals and delivers structured assessments | On-demand |
 
-## Architecture
+## Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nickdnj/ClaudeAgents.git
+   cd ClaudeAgents
+   ```
+
+2. **Install required MCP servers** (see [MCP Server Setup](#mcp-server-setup) below)
+
+3. **Start Claude Code** in the repository directory
+   ```bash
+   claude
+   ```
+
+4. The Manager agent will automatically load via `CLAUDE.md` and:
+   - Check GitHub for updates
+   - Discover available agents
+   - Present an agent selection menu
+
+## Repository Structure
 
 ```
 ClaudeAgents/
@@ -39,64 +57,106 @@ ClaudeAgents/
 └── Wharfside_Logo.png     # Branding asset
 ```
 
+## MCP Server Setup
+
+Agents rely on [Model Context Protocol](https://modelcontextprotocol.io/) servers for external integrations. If an MCP server is not installed, the Manager will warn you and the dependent agent won't be available.
+
+### Required Servers
+
+| Server | Purpose | Agents Using |
+|--------|---------|--------------|
+| `gmail` | Email search, read, send | Monthly Bulletin, Proposal Review |
+| `gdrive` | Google Drive document management | Monthly Bulletin, Presentation |
+| `google-docs` | Document creation and editing | Monthly Bulletin |
+| `powerpoint` | PowerPoint presentation creation | Presentation |
+
+### Installation
+
+**Gmail MCP Server**
+```bash
+# Install from npm
+npm install -g @anthropic/mcp-gmail
+# Or follow setup at: https://github.com/anthropics/mcp-gmail
+```
+
+**Google Drive MCP Server**
+```bash
+npm install -g @anthropic/mcp-gdrive
+# Requires Google Cloud OAuth credentials
+```
+
+**Google Docs MCP Server**
+```bash
+npm install -g @anthropic/mcp-google-docs
+```
+
+**PowerPoint MCP Server**
+```bash
+# Clone and set up the Office PowerPoint MCP Server
+git clone https://github.com/anthropics/Office-PowerPoint-MCP-Server.git
+cd Office-PowerPoint-MCP-Server
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Claude Code Configuration
+
+Add MCP servers to your Claude Code settings (`~/.claude/settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "mcp-gmail",
+      "args": []
+    },
+    "gdrive": {
+      "command": "mcp-gdrive",
+      "args": []
+    },
+    "google-docs": {
+      "command": "mcp-google-docs",
+      "args": []
+    },
+    "powerpoint": {
+      "command": "/path/to/Office-PowerPoint-MCP-Server/.venv/bin/python",
+      "args": ["/path/to/Office-PowerPoint-MCP-Server/ppt_mcp_server.py"]
+    }
+  }
+}
+```
+
 ## How It Works
 
-### 1. Manager Agent
-The Manager agent is the entry point. It:
+### Manager Agent
+The Manager is the entry point and orchestrator:
 - Checks GitHub for updates on startup and prompts to pull
 - Discovers available agents from the local repository
-- Presents agent selection and handles delegation
+- Validates MCP server availability for each agent
+- Presents agent selection menu
 - Tracks document versioning lifecycle (Draft → Review → Final)
 - Prompts for Claude restart if Manager itself was updated
 
-### 2. Monthly Bulletin Agent
+### Monthly Bulletin Agent
 Automates community newsletter creation:
-- **Mines Gmail** for the past 30 days of board communications
-- **Categorizes content** (projects, governance, seasonal, safety, etc.)
-- **Generates HTML email** with professional styling and embedded logo
-- **Iterates via email** - reply with feedback, receive updated draft
-- **Version tracking** - v0.1 → v0.2 → ... → v1.0 (final)
+- Mines Gmail for the past 30 days of board communications
+- Categorizes content (projects, governance, seasonal, safety)
+- Generates HTML email with professional styling
+- Supports iterative review via email replies
+- Version tracking: v0.1 → v0.2 → ... → v1.0 (final)
 
-### 3. Presentation Agent
+### Presentation Agent
 Creates professional PowerPoint presentations:
-- **Uses branded templates** with Wharfside Manor styling
-- **Multiple presentation types** - board meetings, project updates, community announcements
-- **Content from any source** - bulletins, emails, documents
-- **Saves to Desktop or Google Drive**
+- Uses branded templates with Wharfside Manor styling
+- Supports board meetings, project updates, community announcements
+- Can convert bulletins, emails, or documents to slides
+- Saves to Desktop or Google Drive
 
-### 4. Proposal Review Agent
+### Proposal Review Agent
 Streamlines vendor proposal analysis:
 - Extracts key terms, pricing, and scope
 - Compares against budget and past contracts
 - Generates structured assessment with recommendations
-
-## MCP Server Dependencies
-
-Agents leverage these [Model Context Protocol](https://modelcontextprotocol.io/) servers:
-
-| Server | Purpose |
-|--------|---------|
-| `gmail` | Email search, read, send |
-| `gdrive` | Google Drive document management |
-| `google-docs` | Document creation and editing |
-| `powerpoint` | PowerPoint presentation creation |
-
-## Getting Started
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/nickdnj/ClaudeAgents.git
-   cd ClaudeAgents
-   ```
-
-2. **Configure MCP servers** in your Claude Code settings
-
-3. **Start Claude Code** in the repository directory
-   ```bash
-   claude
-   ```
-
-4. The Manager agent will automatically load via `CLAUDE.md`
 
 ## Configuration
 
@@ -106,16 +166,6 @@ Each agent's `config.json` defines:
 - **Styling** (colors, fonts, layout)
 - **Versioning** (draft/review/final workflow)
 - **Notifications** (email templates)
-
-## Example: Monthly Bulletin
-
-The bulletin agent produces professional HTML emails like:
-
-- Branded masthead with logo
-- Emergency contacts box
-- Organized sections with emoji headers
-- Highlight boxes for key updates
-- Clean, mobile-friendly formatting
 
 ## License
 
