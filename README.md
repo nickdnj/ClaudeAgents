@@ -24,7 +24,7 @@ ClaudeAgents/
 ├── CLAUDE.md              # Global instructions for Claude Code
 ├── Manager/
 │   ├── SKILL.md           # Agent orchestration logic
-│   └── config.json        # Cache and discovery settings
+│   └── config.json        # GitHub sync and discovery settings
 ├── Monthly Bulletin/
 │   ├── SKILL.md           # Bulletin generation workflow
 │   ├── config.json        # Gmail, styling, versioning config
@@ -43,10 +43,11 @@ ClaudeAgents/
 
 ### 1. Manager Agent
 The Manager agent is the entry point. It:
-- Discovers available agents from local filesystem or Google Drive
-- Manages configuration caching and sync
+- Checks GitHub for updates on startup and prompts to pull
+- Discovers available agents from the local repository
 - Presents agent selection and handles delegation
 - Tracks document versioning lifecycle (Draft → Review → Final)
+- Prompts for Claude restart if Manager itself was updated
 
 ### 2. Monthly Bulletin Agent
 Automates community newsletter creation:
