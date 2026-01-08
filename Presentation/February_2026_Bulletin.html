@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wharfside Manor - February 2026 Bulletin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; color: white; overflow: hidden; }
+
+        .slide-container { width: 100vw; height: 100vh; display: flex; transition: transform 0.5s ease; }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+        }
+
+        /* Slide backgrounds */
+        .slide-title { background: linear-gradient(135deg, #1a5276 0%, #2980b9 50%, #3498db 100%); }
+        .slide-emergency { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); }
+        .slide-meetings { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+        .slide-maintenance { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); }
+        .slide-laundry { background: linear-gradient(135deg, #2980b9 0%, #3498db 100%); }
+        .slide-pool { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); }
+        .slide-marina { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+        .slide-plumbing { background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%); }
+        .slide-parking { background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%); }
+        .slide-2026 { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+        .slide-winter { background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1a5276 100%); }
+        .slide-thanks { background: linear-gradient(135deg, #1a5276 0%, #2980b9 50%, #3498db 100%); }
+
+        .logo { width: 180px; height: auto; border-radius: 12px; background: white; padding: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); margin-bottom: 30px; }
+
+        h1 { font-size: 3.5em; margin-bottom: 20px; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); }
+        h2 { font-size: 2.8em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        h3 { font-size: 2em; margin-bottom: 20px; opacity: 0.9; }
+
+        .subtitle { font-size: 1.5em; opacity: 0.9; margin-bottom: 15px; }
+        .month-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 15px 40px; border-radius: 30px; font-size: 1.8em; margin: 20px 0; }
+
+        .icon { font-size: 4em; margin-bottom: 20px; }
+
+        ul { text-align: left; font-size: 1.4em; line-height: 2; list-style: none; }
+        ul li { padding: 10px 0; padding-left: 40px; position: relative; }
+        ul li::before { content: '▶'; position: absolute; left: 0; color: rgba(255,255,255,0.7); }
+
+        .highlight-box {
+            background: rgba(255,255,255,0.15);
+            padding: 30px 50px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            max-width: 800px;
+        }
+
+        .date-box {
+            background: rgba(255,255,255,0.25);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .contact-grid {
+            display: grid;
+            gap: 20px;
+            text-align: left;
+            font-size: 1.3em;
+        }
+
+        .contact-item { background: rgba(255,255,255,0.15); padding: 20px 30px; border-radius: 10px; }
+        .contact-item strong { font-size: 1.1em; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; }
+
+        /* Navigation */
+        .nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+        .nav button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav button:hover { background: rgba(255,255,255,0.4); }
+        .nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 1.2em;
+            opacity: 0.7;
+        }
+
+        .version { position: fixed; top: 20px; right: 30px; opacity: 0.5; font-size: 0.9em; }
+
+        .new-badge {
+            display: inline-block;
+            background: #e74c3c;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.6em;
+            vertical-align: middle;
+            margin-left: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pool-dates { display: flex; gap: 30px; justify-content: center; margin: 30px 0; }
+        .pool-date { background: rgba(255,255,255,0.2); padding: 25px 35px; border-radius: 15px; }
+        .pool-date .label { font-size: 1em; opacity: 0.8; }
+        .pool-date .date { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+
+        .initiatives-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; text-align: left; }
+        .initiative-item { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; font-size: 1.2em; }
+        .initiative-item span { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="version">Draft v0.7</div>
+
+    <div class="slide-container" id="slideContainer">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-title">
+            <img src="https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo.png" alt="Wharfside Manor" class="logo">
+            <h1>Wharfside Manor</h1>
+            <div class="subtitle">Community Bulletin</div>
+            <div class="month-badge">February 2026</div>
+            <p class="subtitle" style="margin-top: 30px; opacity: 0.8;">Wharfside Manor Condominium Association, Inc.</p>
+        </div>
+
+        <!-- Slide 2: Emergency Contacts -->
+        <div class="slide slide-emergency">
+            <div class="icon">🚨</div>
+            <h2>Emergency Contacts</h2>
+            <div class="contact-grid">
+                <div class="contact-item"><strong>9-1-1</strong> - Fire, Medical, Police Emergencies</div>
+                <div class="contact-item"><strong>ECI Property Management:</strong> (732) 970-6886</div>
+                <div class="contact-item"><strong>Alexander Plumbing:</strong> (732) 422-4244<br><span style="opacity: 0.8;">Urgent heating/plumbing issues</span></div>
+                <div class="contact-item"><strong>ECI Work Order System</strong> - Non-emergency maintenance</div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Monthly Meetings -->
+        <div class="slide slide-meetings">
+            <div class="icon">📅</div>
+            <h2>Monthly Board/ECI Meetings <span class="new-badge">NEW!</span></h2>
+            <div class="highlight-box">
+                Regular monthly meetings between the Board and ECI management have begun in January 2026!
+            </div>
+            <div class="date-box">2nd Tuesday of each month at 6:00 PM via Zoom</div>
+            <p style="font-size: 1.2em; margin-top: 20px; max-width: 700px;">
+                This schedule helps us work through open items efficiently and reduces extensive email exchanges.
+            </p>
+        </div>
+
+        <!-- Slide 4: Building Maintenance -->
+        <div class="slide slide-maintenance">
+            <div class="icon">🔧</div>
+            <h2>Building Maintenance Updates</h2>
+            <div class="two-column">
+                <div>
+                    <h3 style="color: rgba(255,255,255,0.9);">Completed</h3>
+                    <div class="highlight-box" style="text-align: left;">
+                        <strong>Siding Repairs</strong><br>
+                        Storm-damaged siding replaced near Units 127 & 128
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color: rgba(255,255,255,0.9);">In Progress</h3>
+                    <ul>
+                        <li>Unit 44 balcony repair</li>
+                        <li>Window well replacement</li>
+                        <li>Common area windows</li>
+                        <li>Laundry room repairs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Laundry Room -->
+        <div class="slide slide-laundry">
+            <div class="icon">🧺</div>
+            <h2>Laundry Room News</h2>
+            <div class="highlight-box">
+                Laundry rooms underwent scheduled maintenance in early January.<br>
+                Thank you for your patience!
+            </div>
+            <h3 style="margin-top: 40px;">Coming Soon</h3>
+            <div class="date-box" style="font-size: 1.3em;">
+                New Card-Operated Laundry Equipment<br>
+                <span style="font-weight: normal; font-size: 0.8em;">More convenient payment system for residents</span>
+            </div>
+        </div>
+
+        <!-- Slide 6: Pool Season -->
+        <div class="slide slide-pool">
+            <div class="icon">🏊</div>
+            <h2>Pool Season 2026</h2>
+            <p style="font-size: 1.3em; margin-bottom: 30px;">Planning is already underway!</p>
+            <div class="pool-dates">
+                <div class="pool-date">
+                    <div class="label">Opens</div>
+                    <div class="date">May 23</div>
+                </div>
+                <div class="pool-date">
+                    <div class="label">Closes</div>
+                    <div class="date">September 7</div>
+                </div>
+                <div class="pool-date">
+                    <div class="label">Daily Hours</div>
+                    <div class="date">10AM - 7PM</div>
+                </div>
+            </div>
+            <p style="font-size: 1.1em; opacity: 0.8; margin-top: 30px;">
+                Pool rules and access details will be shared closer to opening day.
+            </p>
+        </div>
+
+        <!-- Slide 7: Marina & Plumbing -->
+        <div class="slide slide-marina">
+            <div style="display: flex; gap: 60px; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="icon">⚓</div>
+                    <h2 style="font-size: 2em;">Marina Project</h2>
+                    <div class="highlight-box">
+                        Project continues to progress.<br><br>
+                        Board and ECI coordinating on permits and engineering requirements.
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="icon">🔥</div>
+                    <h2 style="font-size: 2em;">Plumbing & Heating</h2>
+                    <div class="highlight-box">
+                        Community-wide plumbing project remains a top priority.<br><br>
+                        <strong>Urgent Issues:</strong><br>
+                        Alexander Plumbing<br>
+                        (732) 422-4244
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Parking -->
+        <div class="slide slide-parking">
+            <div class="icon">🚗</div>
+            <h2>Parking Reminders</h2>
+            <ul style="font-size: 1.3em; max-width: 700px;">
+                <li>Parking lot tag inspections continue</li>
+                <li>Ensure your vehicle displays a valid tag at all times</li>
+                <li>Need a new or replacement tag? Contact ECI</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 40px;">
+                <strong>Coming Later in 2026:</strong><br>
+                Spring parking lot paving<br>
+                <span style="opacity: 0.8;">Residents will be notified in advance of temporary arrangements</span>
+            </div>
+        </div>
+
+        <!-- Slide 9: Looking Ahead 2026 -->
+        <div class="slide slide-2026">
+            <div class="icon">📋</div>
+            <h2>Looking Ahead in 2026</h2>
+            <div class="initiatives-grid">
+                <div class="initiative-item"><span>📊</span> Capital reserve study</div>
+                <div class="initiative-item"><span>📝</span> 2026 insurance renewal<br><em style="opacity: 0.7; font-size: 0.9em;">(2 years with no claims!)</em></div>
+                <div class="initiative-item"><span>🧹</span> Building power washing proposals</div>
+                <div class="initiative-item"><span>📶</span> WiFi & fob access for Buildings 1, 4, 7</div>
+                <div class="initiative-item"><span>⚡</span> Generator contract review</div>
+                <div class="initiative-item"><span>🔍</span> Crawl space inspection review</div>
+                <div class="initiative-item"><span>📖</span> Community handbook distribution</div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Winter Reminders -->
+        <div class="slide slide-winter">
+            <div class="icon">❄️</div>
+            <h2>Winter Weather Reminders</h2>
+            <ul style="font-size: 1.4em; max-width: 800px;">
+                <li>Keep walkways and stairs near your unit clear of ice and snow</li>
+                <li>Report any building heating issues immediately</li>
+                <li>Drive carefully in icy conditions</li>
+                <li>Allow extra time for parking lot clearing after storms</li>
+            </ul>
+        </div>
+
+        <!-- Slide 11: Thank You -->
+        <div class="slide slide-thanks">
+            <div class="icon">💬</div>
+            <h2>Thank You!</h2>
+            <div class="highlight-box" style="font-size: 1.2em;">
+                Thank you for being part of our Wharfside Manor community.<br><br>
+                Your cooperation and patience as we work through various projects is greatly appreciated.
+            </div>
+            <p style="font-size: 1.8em; margin-top: 40px; font-weight: bold;">
+                Wishing everyone a safe and warm February! ❄️🏠
+            </p>
+            <p style="margin-top: 50px; font-size: 1.3em; opacity: 0.9;">
+                <strong>Warmly,</strong><br>
+                Wharfside Manor Board of Trustees
+            </p>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button onclick="prevSlide()" id="prevBtn">← Previous</button>
+        <button onclick="nextSlide()" id="nextBtn">Next →</button>
+    </div>
+
+    <div class="slide-counter" id="counter">1 / 11</div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 11;
+        const container = document.getElementById('slideContainer');
+        const counter = document.getElementById('counter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateSlide() {
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (diff > 50) nextSlide();
+            if (diff < -50) prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

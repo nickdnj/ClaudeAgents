@@ -1,0 +1,55 @@
+{
+  "name": "presentation",
+  "description": "Creates PowerPoint presentations using templates for Wharfside Manor",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "powerpoint",
+    "gdrive"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user requests presentation creation"
+  },
+
+  "powerpoint": {
+    "server": {
+      "command": "/Users/nickd/Workspaces/mcp_servers/Office-PowerPoint-MCP-Server/.venv/bin/python",
+      "args": [
+        "/Users/nickd/Workspaces/mcp_servers/Office-PowerPoint-MCP-Server/ppt_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/nickd/Workspaces/mcp_servers/Office-PowerPoint-MCP-Server",
+        "PPT_TEMPLATE_PATH": "/Users/nickd/Workspaces/ClaudeAgents/Presentation/templates"
+      }
+    },
+    "docker_alternative": {
+      "command": "/Users/nickd/Workspaces/mcp_servers/Office-PowerPoint-MCP-Server/mcp-docker-wrapper.sh",
+      "env": {
+        "PPT_TEMPLATE_PATH": "/app/templates"
+      }
+    }
+  },
+
+  "templates": {
+    "directory": "templates",
+    "default_template": "Wharfside_TEMPLATE.pptx",
+    "available": {
+      "wharfside": {
+        "file": "Wharfside_TEMPLATE.pptx",
+        "description": "Official Wharfside Manor branded template",
+        "use_cases": ["board meetings", "community updates", "project reports"]
+      }
+    }
+  },
+
+  "gdrive": {
+    "output_folder_name": "Presentations"
+  },
+
+  "defaults": {
+    "output_directory": "~/Desktop",
+    "naming_convention": "{topic}_{date}.pptx"
+  }
+}

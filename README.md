@@ -14,6 +14,7 @@ This repository contains Claude Code agent configurations (skills) that automate
 |-------|-------------|---------|
 | **Manager** | Orchestrates agent infrastructure, handles discovery and workflow lifecycle | On startup |
 | **Monthly Bulletin** | Mines Gmail for updates, generates branded HTML community bulletins | Scheduled or on-demand |
+| **Presentation** | Creates PowerPoint presentations from content using branded templates | On-demand |
 | **Proposal Review** | Analyzes vendor proposals and delivers structured assessments | On-demand |
 
 ## Architecture
@@ -28,6 +29,10 @@ ClaudeAgents/
 │   ├── SKILL.md           # Bulletin generation workflow
 │   ├── config.json        # Gmail, styling, versioning config
 │   └── examples/          # Past bulletins for reference
+├── Presentation/
+│   ├── SKILL.md           # PowerPoint creation workflow
+│   ├── config.json        # Template and output settings
+│   └── templates/         # Branded PPTX templates
 ├── proposal-review/
 │   ├── SKILL.md           # Proposal analysis framework
 │   └── config.json        # Review criteria and output format
@@ -51,7 +56,14 @@ Automates community newsletter creation:
 - **Iterates via email** - reply with feedback, receive updated draft
 - **Version tracking** - v0.1 → v0.2 → ... → v1.0 (final)
 
-### 3. Proposal Review Agent
+### 3. Presentation Agent
+Creates professional PowerPoint presentations:
+- **Uses branded templates** with Wharfside Manor styling
+- **Multiple presentation types** - board meetings, project updates, community announcements
+- **Content from any source** - bulletins, emails, documents
+- **Saves to Desktop or Google Drive**
+
+### 4. Proposal Review Agent
 Streamlines vendor proposal analysis:
 - Extracts key terms, pricing, and scope
 - Compares against budget and past contracts
@@ -66,6 +78,7 @@ Agents leverage these [Model Context Protocol](https://modelcontextprotocol.io/)
 | `gmail` | Email search, read, send |
 | `gdrive` | Google Drive document management |
 | `google-docs` | Document creation and editing |
+| `powerpoint` | PowerPoint presentation creation |
 
 ## Getting Started
 
