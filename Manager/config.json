@@ -1,0 +1,31 @@
+{
+  "name": "manager",
+  "description": "Orchestrates Claude Code agent infrastructure",
+  "version": "1.0",
+  
+  "cache": {
+    "location": "~/.claude-code/cache",
+    "check_on_startup": true,
+    "prompt_for_updates": true
+  },
+  
+  "gdrive": {
+    "agents_folder_path": "Claude Agents",
+    "required_files": ["SKILL.md", "config.json"]
+  },
+  
+  "agent_detection": {
+    "ignore_hidden": true,
+    "ignore_folders": [".git", "node_modules", "__pycache__"]
+  },
+  
+  "session": {
+    "cache_updates_on_startup_only": true,
+    "allow_multiple_sessions": true
+  },
+  
+  "defaults": {
+    "timezone": "America/New_York",
+    "date_format": "%B %d, %Y"
+  }
+}

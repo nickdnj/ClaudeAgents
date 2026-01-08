@@ -1,0 +1,59 @@
+{
+  "name": "proposal-review",
+  "description": "Analyzes vendor proposals and delivers structured assessments via email",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "gmail",
+    "gdrive"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user requests proposal review"
+  },
+
+  "gmail": {
+    "account": "nickd@wharfsidemb.com",
+    "search_terms": ["proposal", "quote", "bid", "estimate", "pricing"],
+    "attachment_types": ["pdf", "docx", "xlsx"]
+  },
+
+  "gdrive": {
+    "output_folder_name": "Proposal Analyses",
+    "comparison_sheets_folder": "Proposal Comparisons"
+  },
+
+  "notifications": {
+    "email": "nickd@wharfsidemb.com",
+    "templates": {
+      "analysis_complete": {
+        "subject": "📋 Vendor Proposal Analysis: {vendor_name} - {project_type}",
+        "body": "Hi Nick,\n\nI've completed the analysis of the proposal from {vendor_name}.\n\n**Quick Summary:**\n- Total Price: {total_price}\n- Timeline: {timeline}\n- Overall Assessment: {assessment}\n\nFull analysis is attached below.\n\n{analysis_report}\n\nBest,\nProposal Review Agent"
+      },
+      "comparison_complete": {
+        "subject": "📊 Proposal Comparison: {project_type} ({vendor_count} vendors)",
+        "body": "Hi Nick,\n\nI've compared {vendor_count} proposals for {project_type}.\n\n**Recommendation:** {recommendation}\n\nSee the full comparison below.\n\n{comparison_report}\n\nBest,\nProposal Review Agent"
+      }
+    }
+  },
+
+  "analysis": {
+    "risk_thresholds": {
+      "high_deposit_percentage": 50,
+      "unusual_price_variance": 30
+    },
+    "required_fields": [
+      "vendor_name",
+      "scope",
+      "total_price",
+      "timeline"
+    ],
+    "recommended_fields": [
+      "warranty",
+      "insurance",
+      "payment_terms",
+      "references"
+    ]
+  }
+}

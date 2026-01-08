@@ -1,0 +1,66 @@
+{
+  "name": "monthly-bulletin",
+  "description": "Generates monthly community bulletin for Wharfside Manor as HTML email",
+  "version": "2.0",
+
+  "mcp_servers": [
+    "gmail"
+  ],
+
+  "schedule": {
+    "cron": "0 9 25 * *",
+    "description": "9:00 AM on the 25th of every month",
+    "timezone": "America/New_York"
+  },
+
+  "gmail": {
+    "account": "nickd@wharfsidemb.com",
+    "lookback_days": 30
+  },
+
+  "logo": {
+    "url": "https://drive.google.com/uc?export=view&id=LOGO_FILE_ID_HERE",
+    "alt_text": "Wharfside Manor Logo",
+    "width": "250px",
+    "note": "Replace LOGO_FILE_ID_HERE with the Google Drive file ID of the Wharfside logo"
+  },
+
+  "email": {
+    "to": "nickd@wharfsidemb.com",
+    "subject_format": "{month} {year} Monthly Bulletin - Draft v{version}",
+    "mime_type": "text/html"
+  },
+
+  "notifications": {
+    "email": "nickd@wharfsidemb.com",
+    "templates": {
+      "new_draft": {
+        "subject": "{month} {year} Monthly Bulletin - Draft v{version}",
+        "note": "HTML bulletin is sent directly as the email body"
+      },
+      "published_for_review": {
+        "subject": "{month} {year} Monthly Bulletin - v{version} FOR BOARD REVIEW",
+        "note": "Same bulletin with updated subject line indicating board review status"
+      }
+    }
+  },
+
+  "versioning": {
+    "draft_prefix": "0.",
+    "release_version": "1.0",
+    "statuses": {
+      "draft": "Draft",
+      "published": "For Board Review",
+      "released": "Final"
+    }
+  },
+
+  "styling": {
+    "primary_color": "#1a5276",
+    "accent_color": "#f39c12",
+    "background_highlight": "#eaf2f8",
+    "emergency_background": "#fef9e7",
+    "font_family": "Arial, sans-serif",
+    "max_width": "700px"
+  }
+}
