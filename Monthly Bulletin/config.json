@@ -19,10 +19,11 @@
   },
 
   "logo": {
-    "url": "https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo.png",
+    "url": "https://raw.githubusercontent.com/nickdnj/ClaudeAgents/main/Wharfside_Logo_Cropped.png",
     "alt_text": "Wharfside Manor",
-    "width": "160px",
-    "local_path": "Wharfside_Logo.png"
+    "width": "180px",
+    "local_path": "Wharfside_Logo_Cropped.png",
+    "original": "Wharfside_Logo.png"
   },
 
   "email": {
