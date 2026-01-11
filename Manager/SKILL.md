@@ -488,6 +488,17 @@ The Manager Agent is working correctly when:
 ✓ Handles errors gracefully with clear messages
 ✓ Maintains state throughout a work session
 
+## Voice Mode Settings
+
+When using voice mode for conversations, apply these settings for a more natural speaking experience:
+
+| Parameter | Value | Purpose |
+|-----------|-------|---------|
+| `vad_aggressiveness` | 0 | Least aggressive voice detection, allows longer pauses |
+| `listen_duration_min` | 6 | Minimum 6 seconds of recording before silence detection |
+
+These settings ensure the user has time to pause and gather thoughts without being cut off prematurely.
+
 ## Iteration & Improvement
 
 This skill will evolve based on usage:

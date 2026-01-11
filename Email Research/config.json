@@ -1,0 +1,58 @@
+{
+  "name": "email-research",
+  "description": "Mines Gmail for topic-specific information and generates structured research reports via email",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "gmail"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user requests research on a topic"
+  },
+
+  "gmail": {
+    "account": "nickd@wharfsidemb.com",
+    "default_lookback_days": 90
+  },
+
+  "output": {
+    "format": "html-email",
+    "to": "nickd@wharfsidemb.com",
+    "subject_format": "Email Research: {topic} - Draft v{version}",
+    "final_subject_format": "Email Research: {topic} - v1.0 FINAL",
+    "mime_type": "text/html"
+  },
+
+  "versioning": {
+    "draft_prefix": "0.",
+    "release_version": "1.0",
+    "statuses": {
+      "draft": "Draft",
+      "final": "FINAL"
+    }
+  },
+
+  "report_sections": [
+    "executive_summary",
+    "timeline",
+    "key_themes",
+    "decisions",
+    "action_items",
+    "stakeholders",
+    "outstanding_questions",
+    "sources"
+  ],
+
+  "integrations": {
+    "presentation": {
+      "agent": "Presentation",
+      "handoff_format": "summary_with_bullet_points"
+    },
+    "email_composition": {
+      "enabled": true,
+      "handoff_format": "context_and_talking_points"
+    }
+  }
+}
