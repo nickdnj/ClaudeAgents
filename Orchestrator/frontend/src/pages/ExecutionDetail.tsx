@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play, Trash2, Mic, MicOff } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play, Trash2, Mic, MicOff, Link as LinkIcon, FileText, Image } from 'lucide-react';
 import { executionsApi, agentsApi, type Execution, type ExecutionStatus } from '../api/client';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
@@ -295,6 +295,79 @@ Follow-up question: ${followUpTask}`;
         </div>
       </div>
 
+      {/* Context */}
+      {execution.context && (() => {
+        try {
+          const ctx = JSON.parse(execution.context);
+          const hasContent = ctx.urls?.length || ctx.file_paths?.length || ctx.images?.length;
+          if (!hasContent) return null;
+
+          return (
+            <div className="card">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">Context Provided</h3>
+              </div>
+              <div className="p-6 space-y-4">
+                {ctx.urls?.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                      <LinkIcon className="h-4 w-4" />
+                      URLs ({ctx.urls.length})
+                    </p>
+                    <div className="space-y-1">
+                      {ctx.urls.map((url: string, i: number) => (
+                        <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+                          <LinkIcon className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-primary hover:underline">
+                            {url}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {ctx.file_paths?.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                      <FileText className="h-4 w-4" />
+                      Local Documents ({ctx.file_paths.length})
+                    </p>
+                    <div className="space-y-1">
+                      {ctx.file_paths.map((path: string, i: number) => (
+                        <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+                          <FileText className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          <span className="flex-1 truncate font-mono text-gray-700">{path}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {ctx.images?.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                      <Image className="h-4 w-4" />
+                      Images ({ctx.images.length})
+                    </p>
+                    <div className="space-y-1">
+                      {ctx.images.map((path: string, i: number) => (
+                        <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+                          <Image className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          <span className="flex-1 truncate font-mono text-gray-700">{path}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        } catch {
+          return null;
+        }
+      })()}
+
       {/* Output */}
       {execution.output && (
         <div className="card">
@@ -365,11 +438,49 @@ Follow-up question: ${followUpTask}`;
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-6">
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
               <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500 mb-1">Previous task:</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{execution.task}</p>
               </div>
+
+              {/* Show context from previous task */}
+              {execution.context && (() => {
+                try {
+                  const ctx = JSON.parse(execution.context);
+                  const hasContent = ctx.urls?.length || ctx.file_paths?.length || ctx.images?.length;
+                  if (!hasContent) return null;
+
+                  return (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-700 font-medium mb-2">Context included:</p>
+                      <div className="space-y-1 text-sm text-blue-600">
+                        {ctx.urls?.length > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <LinkIcon className="h-3.5 w-3.5" />
+                            <span>{ctx.urls.length} URL{ctx.urls.length !== 1 ? 's' : ''}</span>
+                          </div>
+                        )}
+                        {ctx.file_paths?.length > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <FileText className="h-3.5 w-3.5" />
+                            <span>{ctx.file_paths.length} document{ctx.file_paths.length !== 1 ? 's' : ''}</span>
+                          </div>
+                        )}
+                        {ctx.images?.length > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <Image className="h-3.5 w-3.5" />
+                            <span>{ctx.images.length} image{ctx.images.length !== 1 ? 's' : ''}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                } catch {
+                  return null;
+                }
+              })()}
+
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Follow-up Question

@@ -52,6 +52,14 @@ def init_db(db_path: str):
         conn.commit()
     except sqlite3.OperationalError:
         pass  # Column already exists
+
+    # Add context column if it doesn't exist (for existing databases)
+    try:
+        conn.execute('ALTER TABLE executions ADD COLUMN context TEXT')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     conn.commit()
     conn.close()
 

@@ -3,7 +3,10 @@ Agent management API endpoints.
 """
 import subprocess
 import json
+import os
+import tempfile
 from flask import Blueprint, jsonify, request, current_app
+from werkzeug.utils import secure_filename
 from app.services.agent_registry import AgentRegistry
 from app.services.claude_executor import ClaudeExecutor
 from app.services.git_service import GitService
@@ -247,6 +250,18 @@ def delete_agent(folder: str):
 # Agent Execution Endpoint
 # ============================================================================
 
+def save_temp_image(file) -> str:
+    """Save uploaded image to temp directory and return path."""
+    temp_dir = tempfile.gettempdir()
+    orchestrator_temp = os.path.join(temp_dir, 'orchestrator_uploads')
+    os.makedirs(orchestrator_temp, exist_ok=True)
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(orchestrator_temp, f"{os.urandom(8).hex()}_{filename}")
+    file.save(filepath)
+    return filepath
+
+
 @agents_bp.route('/agents/<folder>/execute', methods=['POST'])
 def execute_agent(folder: str):
     """
@@ -255,22 +270,45 @@ def execute_agent(folder: str):
     Args:
         folder: Agent folder name
 
-    Request body:
+    Request body (JSON or FormData):
         - task: Task description (required)
-        - timeout: Execution timeout in seconds (optional)
+        - urls: List of URLs to fetch content from (optional)
+        - file_paths: List of local file paths to include (optional)
+        - image_N: Uploaded images (FormData only, optional)
 
     Returns:
         Execution record with status 'running'
     """
-    data = request.get_json()
+    # Parse request - handle both JSON and FormData
+    content_type = request.content_type or ''
 
-    if not data:
-        return jsonify({
-            'error': 'Request body required',
-            'code': 'MISSING_BODY'
-        }), 400
+    if content_type.startswith('multipart/form-data'):
+        # FormData with potential file uploads
+        task = request.form.get('task', '').strip()
+        urls = json.loads(request.form.get('urls', '[]'))
+        file_paths = json.loads(request.form.get('file_paths', '[]'))
 
-    task = data.get('task', '').strip()
+        # Handle uploaded images
+        images = []
+        for key in request.files:
+            if key.startswith('image_'):
+                f = request.files[key]
+                if f.filename:
+                    temp_path = save_temp_image(f)
+                    images.append(temp_path)
+    else:
+        # JSON request
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'error': 'Request body required',
+                'code': 'MISSING_BODY'
+            }), 400
+
+        task = data.get('task', '').strip()
+        urls = data.get('urls', []) or []
+        file_paths = data.get('file_paths', []) or []
+        images = []
 
     if not task:
         return jsonify({
@@ -288,11 +326,22 @@ def execute_agent(folder: str):
             'code': 'AGENT_NOT_FOUND'
         }), 404
 
-    # Create execution record
+    # Build context dict
+    context = {
+        'urls': urls if urls else None,
+        'file_paths': file_paths if file_paths else None,
+        'images': images if images else None,
+    }
+    # Remove None values
+    context = {k: v for k, v in context.items() if v}
+
+    # Create execution record with context metadata
+    context_json = json.dumps(context) if context else None
     execution = Execution.create(
         agent_folder=folder,
         task=task,
-        triggered_by='manual'
+        triggered_by='manual',
+        context=context_json
     )
 
     # Capture values needed for background thread
@@ -330,7 +379,7 @@ def execute_agent(folder: str):
 
     # Execute asynchronously in background thread
     executor = get_executor()
-    executor.execute_async(folder, task, on_complete, on_pid)
+    executor.execute_async(folder, task, on_complete, on_pid, context=context if context else None)
 
     # Return immediately with 'running' status
     return jsonify(execution.to_dict()), 202

@@ -33,6 +33,13 @@ export interface Execution {
   duration_seconds: number | null;
   triggered_by: string;
   pid?: number | null;
+  context?: string | null;
+}
+
+export interface ExecutionContext {
+  urls?: string[];
+  file_paths?: string[];
+  images?: File[];
 }
 
 export interface ExecutionStatus {
@@ -84,6 +91,22 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   return response.json();
 }
 
+async function requestFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  const url = `${API_BASE}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    // Don't set Content-Type - browser will set it with boundary for multipart
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
 // Agent API
 export const agentsApi = {
   list: () => request<Agent[]>('/api/agents'),
@@ -115,10 +138,35 @@ export const agentsApi = {
     body: JSON.stringify({ confirm }),
   }),
 
-  execute: (folder: string, task: string) => request<Execution>(`/api/agents/${encodeURIComponent(folder)}/execute`, {
-    method: 'POST',
-    body: JSON.stringify({ task }),
-  }),
+  execute: (folder: string, task: string, context?: ExecutionContext) => {
+    const endpoint = `/api/agents/${encodeURIComponent(folder)}/execute`;
+
+    // Use FormData if images are present
+    if (context?.images && context.images.length > 0) {
+      const formData = new FormData();
+      formData.append('task', task);
+      if (context.urls) {
+        formData.append('urls', JSON.stringify(context.urls));
+      }
+      if (context.file_paths) {
+        formData.append('file_paths', JSON.stringify(context.file_paths));
+      }
+      context.images.forEach((img, i) => {
+        formData.append(`image_${i}`, img);
+      });
+      return requestFormData<Execution>(endpoint, formData);
+    }
+
+    // Use JSON for requests without images
+    return request<Execution>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        task,
+        urls: context?.urls,
+        file_paths: context?.file_paths,
+      }),
+    });
+  },
 
   history: (folder: string, limit?: number) =>
     request<Array<{ hash: string; author_name: string; date: string; message: string }>>(

@@ -24,9 +24,11 @@ class Execution:
     duration_seconds: Optional[float] = None
     triggered_by: str = 'manual'
     pid: Optional[int] = None
+    context: Optional[str] = None  # JSON string with URLs, file paths, images metadata
 
     @classmethod
-    def create(cls, agent_folder: str, task: str, triggered_by: str = 'manual') -> 'Execution':
+    def create(cls, agent_folder: str, task: str, triggered_by: str = 'manual',
+               context: Optional[str] = None) -> 'Execution':
         """Create a new execution record."""
         execution = cls(
             id=f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}",
@@ -34,7 +36,8 @@ class Execution:
             task=task,
             status='running',
             started_at=datetime.utcnow().isoformat(),
-            triggered_by=triggered_by
+            triggered_by=triggered_by,
+            context=context
         )
         execution.save()
         return execution
@@ -44,12 +47,12 @@ class Execution:
         db = get_db()
         db.execute('''
             INSERT OR REPLACE INTO executions
-            (id, agent_folder, task, status, output, error, started_at, completed_at, duration_seconds, triggered_by, pid)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (id, agent_folder, task, status, output, error, started_at, completed_at, duration_seconds, triggered_by, pid, context)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             self.id, self.agent_folder, self.task, self.status,
             self.output, self.error, self.started_at, self.completed_at,
-            self.duration_seconds, self.triggered_by, self.pid
+            self.duration_seconds, self.triggered_by, self.pid, self.context
         ))
         db.commit()
 

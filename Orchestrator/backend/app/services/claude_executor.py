@@ -4,8 +4,10 @@ Claude Executor - Runs agents via Claude Code CLI.
 import subprocess
 import json
 import threading
+import base64
+import requests
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Callable, Dict, Any
 from dataclasses import dataclass
 
 
@@ -73,6 +75,87 @@ class ClaudeExecutor:
             return None
 
         return json.dumps({"mcpServers": filtered_configs})
+
+    def _fetch_url_content(self, url: str, max_size: int = 50000) -> str:
+        """Fetch content from a URL."""
+        try:
+            response = requests.get(url, timeout=30, headers={
+                'User-Agent': 'Orchestrator/1.0'
+            })
+            response.raise_for_status()
+            content = response.text[:max_size]
+            if len(response.text) > max_size:
+                content += f"\n\n[Truncated - original size: {len(response.text)} chars]"
+            return content
+        except Exception as e:
+            return f"[Error fetching URL: {str(e)}]"
+
+    def _read_file_content(self, path: str, max_size: int = 50000) -> str:
+        """Read content from a local file."""
+        try:
+            file_path = Path(path)
+            if not file_path.exists():
+                return f"[File not found: {path}]"
+
+            # Check file size first
+            size = file_path.stat().st_size
+            if size > max_size * 2:  # Allow some buffer for text files
+                return f"[File too large: {size} bytes]"
+
+            content = file_path.read_text(errors='replace')[:max_size]
+            if len(content) == max_size:
+                content += f"\n\n[Truncated - original size: {size} bytes]"
+            return content
+        except Exception as e:
+            return f"[Error reading file: {str(e)}]"
+
+    def _encode_image_base64(self, path: str, max_size: int = 5_000_000) -> str:
+        """Encode an image file as base64."""
+        try:
+            file_path = Path(path)
+            if not file_path.exists():
+                return f"[Image not found: {path}]"
+
+            size = file_path.stat().st_size
+            if size > max_size:
+                return f"[Image too large: {size} bytes, max: {max_size}]"
+
+            with open(file_path, 'rb') as f:
+                data = f.read()
+            return base64.b64encode(data).decode('utf-8')
+        except Exception as e:
+            return f"[Error encoding image: {str(e)}]"
+
+    def _build_context_section(self, context: Optional[Dict[str, Any]]) -> str:
+        """Build the context section for the prompt."""
+        if not context:
+            return ""
+
+        parts = []
+
+        # Process URLs
+        if context.get('urls'):
+            for url in context['urls']:
+                content = self._fetch_url_content(url)
+                parts.append(f'<url src="{url}">\n{content}\n</url>')
+
+        # Process file paths
+        if context.get('file_paths'):
+            for path in context['file_paths']:
+                content = self._read_file_content(path)
+                parts.append(f'<document path="{path}">\n{content}\n</document>')
+
+        # Process images
+        if context.get('images'):
+            for img_path in context['images']:
+                b64 = self._encode_image_base64(img_path)
+                filename = Path(img_path).name
+                parts.append(f'<image filename="{filename}">\n{b64}\n</image>')
+
+        if not parts:
+            return ""
+
+        return "<context>\n" + "\n\n".join(parts) + "\n</context>\n\n"
 
     def execute(self, agent_folder: str, task: str,
                 on_complete: Optional[Callable[[ExecutionResult], None]] = None) -> ExecutionResult:
@@ -182,7 +265,8 @@ Execute this task according to your SKILL.md instructions."""
 
     def execute_async(self, agent_folder: str, task: str,
                       on_complete: Callable[[ExecutionResult], None],
-                      on_pid: Optional[Callable[[int], None]] = None) -> threading.Thread:
+                      on_pid: Optional[Callable[[int], None]] = None,
+                      context: Optional[Dict[str, Any]] = None) -> threading.Thread:
         """
         Execute an agent asynchronously in a background thread.
 
@@ -191,6 +275,7 @@ Execute this task according to your SKILL.md instructions."""
             task: Task description
             on_complete: Callback when execution completes
             on_pid: Optional callback with PID when process starts
+            context: Optional context dict with urls, file_paths, and images
 
         Returns:
             The thread running the execution
@@ -234,6 +319,9 @@ Execute this task according to your SKILL.md instructions."""
                     if mcp_config_json:
                         cmd.extend(['--mcp-config', mcp_config_json])
 
+                # Build the context section (URLs, files, images)
+                context_section = self._build_context_section(context)
+
                 # Build the prompt including the SKILL context
                 skill_content = skill_path.read_text()
                 full_prompt = f"""You are executing as the agent defined in SKILL.md below.
@@ -242,7 +330,7 @@ Execute this task according to your SKILL.md instructions."""
 {skill_content}
 </skill>
 
-Task: {task}
+{context_section}Task: {task}
 
 Execute this task according to your SKILL.md instructions."""
 
