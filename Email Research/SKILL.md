@@ -9,8 +9,8 @@ The Email Research Agent mines Gmail for emails on a specific topic and generate
 1. **Receive Research Topic** - User specifies what to research
 2. **Mine Gmail** - Search for relevant emails using Gmail MCP
 3. **Analyze & Organize** - Extract key information and themes
-4. **Generate Report** - Send structured report as HTML email (v0.1)
-5. **Iterate via Email** - User replies with feedback, agent sends updated versions
+4. **Generate Report** - Create draft HTML email report (v0.1) for user review
+5. **Iterate via Email** - User provides feedback, agent creates updated draft versions
 6. **Finalize** - Report ready for use by other agents
 
 ## Input Requirements
@@ -155,11 +155,18 @@ List of email threads used in the report:
 
 ## Output Format
 
-### Primary Output: HTML Email
-Send research report as a professionally formatted HTML email:
+### CRITICAL: Draft-Only Policy
+**NEVER send emails directly.** Always create drafts and let the user send them.
+- Use `draft_email` instead of `send_email` for all email operations
+- This applies to research reports, replies, and any other email output
+- The user will review and send all emails manually
+
+### Primary Output: HTML Email Draft
+Create research report as a professionally formatted HTML email draft:
 - **To:** nickd@wharfsidemb.com
 - **Subject:** `Email Research: [Topic] - Draft v{version}`
 - **Format:** text/html for rich formatting
+- **Action:** Create draft only - user will send
 
 ### Secondary Output: Markdown Report File
 In addition to the HTML email, save a markdown file as a persistent record:
@@ -227,23 +234,24 @@ In addition to the HTML email, save a markdown file as a persistent record:
 
 **Initial Report (v0.1):**
 1. Complete research and analysis
-2. Send HTML email with full report
+2. Create HTML email draft with full report
 3. Subject: "Email Research: [Topic] - Draft v0.1"
+4. Notify user that draft is ready for review and sending
 
 **User Feedback:**
-- User replies to the email with feedback
+- User reviews the draft and provides feedback
 - Requests for additions, corrections, or focus changes
 - Questions about findings
 
 **Updated Versions (v0.2+):**
-1. Process feedback from email reply
+1. Process feedback from user
 2. Update report accordingly
-3. Send new email with incremented version
+3. Create new email draft with incremented version
 4. Subject: "Email Research: [Topic] - Draft v0.2"
 5. Continue until user is satisfied
 
 **Finalized Report:**
-- When user approves, mark as final
+- When user approves, create final draft
 - Subject: "Email Research: [Topic] - v1.0 FINAL"
 - Ready for handoff to other agents
 
@@ -272,11 +280,11 @@ Agent: I'll search your emails for information about the boiler project.
 [Searches Gmail, analyzes results]
 
 I found 23 emails about the boiler project spanning October through January.
-Sending research report v0.1 to your email now...
+Creating research report draft v0.1 now...
 
-[Sends HTML email report]
+[Creates HTML email draft]
 
-Sent: "Email Research: Boiler Project - Draft v0.1"
+Draft created: "Email Research: Boiler Project - Draft v0.1"
 
 Key findings:
 - Alexander Plumbing selected as contractor
@@ -284,7 +292,8 @@ Key findings:
 - Phase 2 (common area work) scheduled for February
 - Total budget: $47,500
 
-Reply to the email with any feedback or changes you'd like.
+The draft is ready in your Gmail drafts folder. Review and send when ready,
+or let me know if you'd like any changes.
 ```
 
 ### Searching Multiple Accounts
@@ -300,9 +309,11 @@ replacement discussions from 2019.
 I found 8 emails in your board account and 12 emails in your personal
 account about the 2019 roof replacement project.
 
-Sending research report v0.1 to your email now...
+Creating research report draft v0.1 now...
 
-[Sends HTML email report with sources labeled by account]
+[Creates HTML email draft with sources labeled by account]
+
+Draft ready in your Gmail drafts folder.
 ```
 
 ### Personal Account Only
@@ -317,22 +328,23 @@ board minutes.
 
 ### Email-Based Iteration
 ```
-[User replies to email: "Can you add more detail about the Phase 2 timeline
-and include the contact info for Alexander Plumbing?"]
+User: Can you add more detail about the Phase 2 timeline and include the
+contact info for Alexander Plumbing?
 
 Agent: I'll update the report with Phase 2 timeline details and vendor contact info.
 
 [Updates report content]
-[Sends new email]
+[Creates new email draft]
 
-Sent: "Email Research: Boiler Project - Draft v0.2"
+Draft created: "Email Research: Boiler Project - Draft v0.2"
 
 Added:
 - Detailed Phase 2 timeline (February 10-28)
 - Alexander Plumbing contact: 732-422-2424
 - Project manager: Mike Alexander
 
-Reply with further feedback or let me know when it's ready to finalize.
+The updated draft is ready in your Gmail drafts folder. Let me know if you'd
+like any other changes or when it's ready to finalize.
 ```
 
 ### Finalizing a Report
@@ -341,11 +353,12 @@ User: The boiler research report looks good, let's finalize it.
 
 Agent: Marking the report as final.
 
-[Sends final version email]
+[Creates final version draft]
 
-Sent: "Email Research: Boiler Project - v1.0 FINAL"
+Draft created: "Email Research: Boiler Project - v1.0 FINAL"
 
-The research report is now finalized. Would you like me to:
+The final research report draft is ready in your Gmail drafts folder.
+Once you've sent it, would you like me to:
 - Create a presentation from these findings?
 - Help draft a status update email?
 ```
@@ -356,8 +369,8 @@ User: Research marina permits and create a presentation for the board
 
 Agent: I'll research marina permits and then create a presentation.
 
-[Step 1: Research and send email report]
-[Step 2: User reviews and approves report]
+[Step 1: Research and create email report draft]
+[Step 2: User reviews, sends report, and approves findings]
 [Step 3: Hand off to Presentation agent with research context]
 ```
 
