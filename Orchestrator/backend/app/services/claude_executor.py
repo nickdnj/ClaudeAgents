@@ -25,6 +25,53 @@ class ClaudeExecutor:
         self.agents_root = Path(agents_root)
         self.claude_cli_path = claude_cli_path
         self.timeout = timeout
+        self._mcp_configs = self._load_mcp_configs()
+
+    def _load_mcp_configs(self) -> dict:
+        """Load MCP server configurations from Claude settings."""
+        settings_paths = [
+            Path.home() / '.claude.json',
+            Path.home() / '.claude' / 'settings.json',
+        ]
+
+        for settings_path in settings_paths:
+            if settings_path.exists():
+                try:
+                    with open(settings_path) as f:
+                        settings = json.load(f)
+                    return settings.get('mcpServers', {})
+                except (json.JSONDecodeError, IOError):
+                    continue
+        return {}
+
+    def _get_agent_mcp_servers(self, agent_path: Path) -> list[str]:
+        """Get required MCP servers from agent's config.json."""
+        config_path = agent_path / 'config.json'
+        if not config_path.exists():
+            return []
+
+        try:
+            with open(config_path) as f:
+                config = json.load(f)
+            return config.get('mcp_servers', [])
+        except (json.JSONDecodeError, IOError):
+            return []
+
+    def _build_mcp_config_arg(self, required_servers: list[str]) -> Optional[str]:
+        """Build MCP config JSON string for required servers."""
+        if not required_servers or not self._mcp_configs:
+            return None
+
+        # Filter to only include required servers that we have configs for
+        filtered_configs = {}
+        for server_name in required_servers:
+            if server_name in self._mcp_configs:
+                filtered_configs[server_name] = self._mcp_configs[server_name]
+
+        if not filtered_configs:
+            return None
+
+        return json.dumps({"mcpServers": filtered_configs})
 
     def execute(self, agent_folder: str, task: str,
                 on_complete: Optional[Callable[[ExecutionResult], None]] = None) -> ExecutionResult:
@@ -66,7 +113,15 @@ class ClaudeExecutor:
                 '--print',
                 '--output-format', 'text',
                 '--verbose',
+                '--dangerously-skip-permissions',  # Required for non-interactive MCP access
             ]
+
+            # Add MCP server configs if agent requires them
+            required_mcp = self._get_agent_mcp_servers(agent_path)
+            if required_mcp:
+                mcp_config_json = self._build_mcp_config_arg(required_mcp)
+                if mcp_config_json:
+                    cmd.extend(['--mcp-config', mcp_config_json])
 
             # Build the prompt including the SKILL context
             skill_content = skill_path.read_text()
