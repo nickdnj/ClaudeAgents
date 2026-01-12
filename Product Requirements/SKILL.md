@@ -355,6 +355,141 @@ Save locally as markdown:
 - Git-trackable for version control
 - Easy to convert to other formats
 
+---
+
+## Email Review Workflow
+
+For asynchronous document review, use the email-based review pattern. This allows stakeholders to review and provide feedback on their own schedule.
+
+### When to Use Email Review
+
+- User needs time to think through decisions
+- Multiple decision points require stakeholder input
+- Document has open questions that need resolution
+- User prefers async over real-time conversation
+
+### Email Review Format
+
+**IMPORTANT:** HTML checkboxes do NOT survive email replies. Use text-based inputs:
+
+```html
+<!-- DO NOT USE - Checkboxes don't persist -->
+<input type="checkbox"> Option A
+
+<!-- USE THIS INSTEAD - Text inputs that survive replies -->
+YOUR CHOICE: _______________
+
+<!-- Or lettered options -->
+A) First option
+B) Second option
+C) Third option
+
+YOUR CHOICE: ___
+```
+
+### Email Review Template Structure
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; }
+        .question { background: #f8f9fa; border-left: 4px solid #1a5f7a;
+                    padding: 20px; margin: 20px 0; }
+        .input-box { background: #fffef0; border: 2px dashed #e0c050;
+                     padding: 12px; margin: 10px 0; }
+        .option { margin: 12px 0; padding: 10px; background: white;
+                  border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<h1>📝 [Document Title] - Review Form</h1>
+
+<div class="instructions">
+    <h3>How to Complete:</h3>
+    <ul>
+        <li>Type your selection in the yellow boxes</li>
+        <li>For multiple choice, type the letter (A, B, C)</li>
+        <li>Add notes directly below questions</li>
+        <li>Reply to this email when done</li>
+    </ul>
+</div>
+
+<h2>🔧 Section 1: Key Decisions</h2>
+
+<div class="question">
+    <div class="question-title">1. [Decision Topic]</div>
+    <p>[Context for the decision]</p>
+    <div class="option"><strong>A) [Option A]</strong><br>[Description]</div>
+    <div class="option"><strong>B) [Option B]</strong><br>[Description]</div>
+    <div class="option"><strong>C) [Option C]</strong><br>[Description]</div>
+    <div class="input-box">YOUR CHOICE: </div>
+</div>
+
+<h2>📊 Section 2: Priority Review</h2>
+
+<table>
+    <tr><th>Feature</th><th>Priority</th><th>Your Input</th></tr>
+    <tr><td>Feature 1</td><td>P0</td><td class="input-box"></td></tr>
+    <tr><td>Feature 2</td><td>P1</td><td class="input-box"></td></tr>
+</table>
+
+<h2>❓ Section 3: Open Questions</h2>
+
+<div class="question">
+    <div class="question-title">[Question]</div>
+    <div class="input-box">YOUR ANSWER: </div>
+</div>
+
+<h2>✅ Final Approval</h2>
+
+<div class="question">
+    <div class="option"><strong>A) Approved</strong> — Proceed</div>
+    <div class="option"><strong>B) Needs revision</strong> — Update first</div>
+    <div class="option"><strong>C) Major changes</strong> — Discuss further</div>
+    <div class="input-box">DECISION: </div>
+</div>
+
+</body>
+</html>
+```
+
+### Sending Review Emails
+
+1. **Create the PRD first** - Complete the initial draft
+2. **Identify decision points** - List all open questions and choices
+3. **Format as HTML email** - Use the template above with text inputs
+4. **Send via Gmail MCP** - Use `mimeType: "text/html"` for proper rendering
+5. **Wait for reply** - User fills in choices and replies
+6. **Search for response** - Find the reply email and parse inputs
+7. **Update document** - Incorporate feedback into PRD
+
+### Parsing Email Responses
+
+When reading the reply email, look for patterns like:
+- `YOUR CHOICE: A` or `YOUR CHOICE: B`
+- `DECISION: Approved`
+- Text entered after `YOUR ANSWER:` or in input areas
+- Any freeform notes added by the user
+
+### Version Workflow
+
+1. **v0.1** - Initial draft sent for review
+2. **v0.2** - Updated based on first round of feedback
+3. **v0.N** - Continue iterations until approved
+4. **v1.0** - Final approved version
+
+### Email Review Best Practices
+
+- **Keep it scannable** - Use clear headers and visual hierarchy
+- **Limit decisions** - 5-10 decision points max per email
+- **Provide context** - Explain why each decision matters
+- **Offer recommendations** - Suggest preferred options where appropriate
+- **Include file references** - Link to full documents for context
+- **Set expectations** - Tell user what happens after they reply
+
 ### Handoff to Development
 
 When PRD is complete, offer:

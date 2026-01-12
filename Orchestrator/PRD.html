@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestrator UI - Product Requirements Document</title>
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --success: #155724;
+            --success-bg: #d4edda;
+            --warning: #856404;
+            --warning-bg: #fff3cd;
+            --error: #721c24;
+            --error-bg: #f8d7da;
+            --neutral: #e0e0e0;
+            --bg: #f8f9fa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: var(--bg);
+        }
+
+        h1 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--primary);
+            border-bottom: 1px solid var(--neutral);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #444;
+            margin-top: 25px;
+        }
+
+        h4 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid var(--neutral);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e8f4f8;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .checkbox-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checkbox-list li {
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .checkbox-list li::before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid var(--neutral);
+            margin: 40px 0;
+        }
+
+        .priority-p0 {
+            background: var(--error-bg);
+            color: var(--error);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .priority-p1 {
+            background: var(--warning-bg);
+            color: var(--warning);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .priority-p2 {
+            background: #cce5ff;
+            color: #004085;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .toc {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .toc ol {
+            columns: 2;
+            column-gap: 40px;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .diagram {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .callout {
+            background: #e8f4f8;
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+                max-width: none;
+            }
+
+            .toc {
+                page-break-after: always;
+            }
+
+            h2 {
+                page-break-before: always;
+            }
+
+            h2:first-of-type {
+                page-break-before: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Orchestrator UI - Product Requirements Document</h1>
+
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#personas">User Personas</a></li>
+            <li><a href="#features">Feature Requirements</a></li>
+            <li><a href="#uiux">UI/UX Requirements</a></li>
+            <li><a href="#technical">Technical Requirements</a></li>
+            <li><a href="#api">API Specification</a></li>
+            <li><a href="#flows">User Flows</a></li>
+            <li><a href="#milestones">Milestones and Phases</a></li>
+            <li><a href="#questions">Open Questions</a></li>
+            <li><a href="#metrics">Success Metrics</a></li>
+            <li><a href="#appendix">Appendix</a></li>
+        </ol>
+    </div>
+
+    <h2 id="overview">1. Overview</h2>
+
+    <h3>1.1 Product Summary</h3>
+    <p>The Orchestrator UI is a web-based administration interface for managing Claude Code agents. It provides a centralized dashboard for creating, configuring, monitoring, and triggering autonomous agents that perform tasks using MCP (Model Context Protocol) server integrations.</p>
+
+    <h3>1.2 Problem Statement</h3>
+    <p>Currently, managing Claude Code agents requires:</p>
+    <ul>
+        <li>Manual editing of SKILL.md and config.json files via text editor</li>
+        <li>Command-line execution for triggering agents</li>
+        <li>No visibility into execution history or results</li>
+        <li>No centralized view of MCP server status and authentication</li>
+    </ul>
+    <p>The Orchestrator UI solves these problems by providing a unified web interface for all agent management operations.</p>
+
+    <h3>1.3 Goals</h3>
+    <table>
+        <thead>
+            <tr><th>Goal</th><th>Success Metric</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Reduce agent configuration time</td><td>50% reduction in time to create/edit agents</td></tr>
+            <tr><td>Improve execution visibility</td><td>100% of executions logged and viewable</td></tr>
+            <tr><td>Simplify MCP server management</td><td>Zero command-line interactions required for auth checks</td></tr>
+            <tr><td>Enable non-technical users</td><td>Board members can trigger agents without CLI knowledge</td></tr>
+        </tbody>
+    </table>
+
+    <h3>1.4 Non-Goals</h3>
+    <ul>
+        <li>Real-time collaborative editing (single-user focus)</li>
+        <li>Mobile-optimized interface (desktop-first)</li>
+        <li>Agent code execution within the browser (Claude Code CLI executes externally)</li>
+        <li>MCP server installation or configuration (read-only from Claude Code settings)</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="personas">2. User Personas</h2>
+
+    <div class="section-card">
+        <h3>2.1 Primary User: System Administrator</h3>
+        <p><strong>Name:</strong> Nick (Condo Association Tech Admin)</p>
+        <p><strong>Characteristics:</strong></p>
+        <ul>
+            <li>Technical background, comfortable with code</li>
+            <li>Manages the agent infrastructure</li>
+            <li>Needs to create new agents, edit configurations, monitor health</li>
+        </ul>
+        <p><strong>Key Tasks:</strong></p>
+        <ul>
+            <li>Create and configure new agents</li>
+            <li>Edit SKILL.md files to refine agent behavior</li>
+            <li>Assign MCP servers to agents</li>
+            <li>Debug failed executions</li>
+            <li>Monitor system health</li>
+        </ul>
+    </div>
+
+    <div class="section-card">
+        <h3>2.2 Secondary User: Agent Operator</h3>
+        <p><strong>Name:</strong> Board Member</p>
+        <p><strong>Characteristics:</strong></p>
+        <ul>
+            <li>Limited technical knowledge</li>
+            <li>Needs to trigger specific agents for tasks</li>
+            <li>Wants simple, guided interactions</li>
+        </ul>
+        <p><strong>Key Tasks:</strong></p>
+        <ul>
+            <li>Browse available agents</li>
+            <li>Trigger agents with custom task descriptions</li>
+            <li>View execution results</li>
+            <li>Re-run failed tasks</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2 id="features">3. Feature Requirements</h2>
+
+    <h3>3.1 Agent Management <span class="priority-p0">P0 - Critical</span></h3>
+
+    <h4>3.1.1 Agent List View</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Display all agents</td><td>Show cards for each discovered agent</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Agent metadata</td><td>Show name, description, trigger type, schedule</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>MCP server badges</td><td>Display which MCP servers each agent uses</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Search/filter</td><td>Filter agents by name, MCP server, or trigger type</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Quick actions</td><td>Run, Edit, Delete buttons per agent</td><td><span class="priority-p0">P0</span></td></tr>
+        </tbody>
+    </table>
+
+    <p><strong>Acceptance Criteria:</strong></p>
+    <ul class="checkbox-list">
+        <li>Agents auto-discovered from filesystem on page load</li>
+        <li>Cards update when new agents are added</li>
+        <li>Visual distinction between scheduled and on-demand agents</li>
+    </ul>
+
+    <h4>3.1.2 Agent Editor</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>SKILL.md editor</td><td>Markdown editor with syntax highlighting</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>config.json editor</td><td>JSON editor with validation</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>MCP server selector</td><td>Checkbox UI for assigning servers</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Save with backup</td><td>Auto-create .bak files before saving</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Preview mode</td><td>Render SKILL.md as formatted markdown</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Diff view</td><td>Show changes before saving</td><td><span class="priority-p2">P2</span></td></tr>
+        </tbody>
+    </table>
+
+    <p><strong>Acceptance Criteria:</strong></p>
+    <ul class="checkbox-list">
+        <li>Unsaved changes warning before navigation</li>
+        <li>JSON validation errors displayed inline</li>
+        <li>Backup files created in same directory</li>
+    </ul>
+
+    <h4>3.1.3 Agent Creation Wizard</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Folder name input</td><td>Validate unique, filesystem-safe name</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Name/description</td><td>Basic metadata fields</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>MCP server selection</td><td>Multi-select from available servers</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Trigger configuration</td><td>Schedule picker or on-demand toggle</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Template selection</td><td>Optional: start from existing agent template</td><td><span class="priority-p1">P1</span></td></tr>
+        </tbody>
+    </table>
+
+    <h3>3.2 MCP Server Management <span class="priority-p0">P0 - Critical</span></h3>
+
+    <h4>3.2.1 Server List View</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Display all servers</td><td>Read from Claude Code settings</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Status indicator</td><td>Available, Connected, Error states</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Auth status</td><td>Authenticated, Needs Auth, Expired</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Server details</td><td>Command, args, environment vars</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Agent usage</td><td>Which agents use each server</td><td><span class="priority-p1">P1</span></td></tr>
+        </tbody>
+    </table>
+
+    <h3>3.3 Execution Monitor <span class="priority-p0">P0 - Critical</span></h3>
+
+    <h4>3.3.1 Execution History</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Run history list</td><td>Paginated list of all executions</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Status column</td><td>Success, Failed, Running, Timeout</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Duration column</td><td>Execution time in seconds</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Agent filter</td><td>Filter by agent name</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Date range filter</td><td>Filter by execution date</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Result preview</td><td>Truncated output in list view</td><td><span class="priority-p1">P1</span></td></tr>
+        </tbody>
+    </table>
+
+    <h4>3.3.2 Execution Detail View</h4>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Full output display</td><td>Scrollable, monospace output</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Error display</td><td>Stderr shown separately in red</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Task/prompt display</td><td>What was sent to the agent</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Re-run button</td><td>Trigger same agent with same task</td><td><span class="priority-p0">P0</span></td></tr>
+            <tr><td>Copy output</td><td>Copy to clipboard button</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Download output</td><td>Save as .txt or .json</td><td><span class="priority-p2">P2</span></td></tr>
+        </tbody>
+    </table>
+
+    <h3>3.4 Dashboard <span class="priority-p1">P1 - Important</span></h3>
+    <table>
+        <thead>
+            <tr><th>Requirement</th><th>Description</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Agent count</td><td>Total agents discovered</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Recent executions</td><td>Last 5 runs with status</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Failed jobs</td><td>Count of failures in last 24h</td><td><span class="priority-p1">P1</span></td></tr>
+            <tr><td>Scheduled jobs</td><td>Upcoming scheduled executions</td><td><span class="priority-p2">P2</span></td></tr>
+            <tr><td>System health</td><td>Orchestrator API status</td><td><span class="priority-p1">P1</span></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="uiux">4. UI/UX Requirements</h2>
+
+    <h3>4.1 Layout Structure</h3>
+    <div class="diagram">┌─────────────────────────────────────────────────────────────────────┐
+│  HEADER: Claude Agents Orchestrator                    [Health: ●]  │
+├─────────────────────────────────────────────────────────────────────┤
+│  NAV: [Agents] [MCP Servers] [Executions] [Dashboard]               │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                                                                 ││
+│  │                     MAIN CONTENT AREA                           ││
+│  │                                                                 ││
+│  │                                                                 ││
+│  └─────────────────────────────────────────────────────────────────┘│
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘</div>
+
+    <h3>4.2 Design Principles</h3>
+    <table>
+        <thead>
+            <tr><th>Principle</th><th>Implementation</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Simplicity</td><td>Minimal chrome, content-focused</td></tr>
+            <tr><td>Clarity</td><td>Clear visual hierarchy, obvious actions</td></tr>
+            <tr><td>Feedback</td><td>Loading states, success/error messages</td></tr>
+            <tr><td>Consistency</td><td>Same patterns across all views</td></tr>
+        </tbody>
+    </table>
+
+    <h3>4.3 Color Scheme</h3>
+    <table>
+        <thead>
+            <tr><th>Element</th><th>Color</th><th>Usage</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Primary</td><td style="background:#1a5f7a;color:white;padding:5px 10px;">#1a5f7a</td><td>Buttons, links, selected states</td></tr>
+            <tr><td>Success</td><td style="background:#d4edda;color:#155724;padding:5px 10px;">#155724 / #d4edda</td><td>Success badges, healthy status</td></tr>
+            <tr><td>Warning</td><td style="background:#fff3cd;color:#856404;padding:5px 10px;">#856404 / #fff3cd</td><td>Auth needed, pending states</td></tr>
+            <tr><td>Error</td><td style="background:#f8d7da;color:#721c24;padding:5px 10px;">#721c24 / #f8d7da</td><td>Failed, expired, error states</td></tr>
+            <tr><td>Neutral</td><td style="background:#e0e0e0;padding:5px 10px;">#e0e0e0</td><td>Borders, dividers</td></tr>
+            <tr><td>Background</td><td style="background:#f8f9fa;padding:5px 10px;">#f8f9fa</td><td>Page background</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="technical">5. Technical Requirements</h2>
+
+    <h3>5.1 Frontend Stack</h3>
+    <table>
+        <thead>
+            <tr><th>Component</th><th>Technology</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Framework</td><td>React 18+</td><td>Component-based, ecosystem</td></tr>
+            <tr><td>State</td><td>React Query or SWR</td><td>Server state caching, refetching</td></tr>
+            <tr><td>Styling</td><td>Tailwind CSS or CSS Modules</td><td>Rapid development</td></tr>
+            <tr><td>Editor</td><td>Monaco Editor</td><td>VS Code-like editing experience</td></tr>
+            <tr><td>Build</td><td>Vite</td><td>Fast development, ESM-native</td></tr>
+        </tbody>
+    </table>
+
+    <h3>5.2 Backend API</h3>
+    <table>
+        <thead>
+            <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>/agents</code></td><td>GET</td><td>List all agents</td></tr>
+            <tr><td><code>/agents/&lt;name&gt;/run</code></td><td>POST</td><td>Trigger agent execution</td></tr>
+            <tr><td><code>/admin/agents</code></td><td>GET</td><td>Detailed agent list</td></tr>
+            <tr><td><code>/admin/agents/&lt;folder&gt;/skill</code></td><td>GET/PUT</td><td>Read/write SKILL.md</td></tr>
+            <tr><td><code>/admin/agents/&lt;folder&gt;/config</code></td><td>GET/PUT</td><td>Read/write config.json</td></tr>
+            <tr><td><code>/admin/agents</code></td><td>POST</td><td>Create new agent</td></tr>
+            <tr><td><code>/admin/mcp-servers</code></td><td>GET</td><td>List MCP servers</td></tr>
+            <tr><td><code>/admin/mcp-servers/&lt;name&gt;/status</code></td><td>GET</td><td>Server health check</td></tr>
+            <tr><td><code>/health</code></td><td>GET</td><td>API health check</td></tr>
+        </tbody>
+    </table>
+
+    <h3>5.3 Performance Requirements</h3>
+    <table>
+        <thead>
+            <tr><th>Metric</th><th>Target</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Initial load</td><td>&lt; 2 seconds</td></tr>
+            <tr><td>API response</td><td>&lt; 500ms</td></tr>
+            <tr><td>Editor save</td><td>&lt; 1 second</td></tr>
+            <tr><td>Agent list refresh</td><td>&lt; 1 second</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="api">6. API Specification Additions</h2>
+
+    <h3>6.1 New Endpoints Required</h3>
+    <pre><code>GET /admin/executions
+  - Returns: List of execution results
+  - Query params: agent, status, limit, offset
+
+GET /admin/executions/&lt;id&gt;
+  - Returns: Full execution details
+
+POST /admin/executions/&lt;id&gt;/rerun
+  - Triggers re-execution of same agent/task
+
+GET /admin/agents/&lt;folder&gt;/delete
+  - Deletes agent folder (with confirmation)
+
+GET /admin/dashboard/stats
+  - Returns: Aggregate stats for dashboard</code></pre>
+
+    <h3>6.2 WebSocket Support (P2)</h3>
+    <pre><code>WS /ws/executions
+  - Real-time execution status updates
+  - Live log streaming during execution</code></pre>
+
+    <hr>
+
+    <h2 id="flows">7. User Flows</h2>
+
+    <div class="section-card">
+        <h3>7.1 Create New Agent</h3>
+        <ol>
+            <li>User clicks "+ New Agent" button</li>
+            <li>Modal opens with creation wizard
+                <ol type="a">
+                    <li>Enter folder name (validated for uniqueness)</li>
+                    <li>Enter display name and description</li>
+                    <li>Select trigger type (scheduled/on-demand)</li>
+                    <li>If scheduled, configure cron expression</li>
+                    <li>Select MCP servers needed</li>
+                </ol>
+            </li>
+            <li>User clicks "Create Agent"</li>
+            <li>System creates folder, SKILL.md, config.json</li>
+            <li>Success toast appears</li>
+            <li>User redirected to edit SKILL.md</li>
+            <li>User customizes SKILL.md content</li>
+            <li>User clicks "Save"</li>
+            <li>Agent ready for use</li>
+        </ol>
+    </div>
+
+    <div class="section-card">
+        <h3>7.2 Trigger Agent Manually</h3>
+        <ol>
+            <li>User navigates to Agents view</li>
+            <li>User clicks "Run" button on agent card</li>
+            <li>Modal opens with task input
+                <ul>
+                    <li>Default task pre-filled if configured</li>
+                    <li>User can modify or use custom task</li>
+                </ul>
+            </li>
+            <li>User clicks "Execute"</li>
+            <li>Modal closes, toast shows "Execution started"</li>
+            <li>Execution appears in monitor with "Running" status</li>
+            <li>When complete, status updates to Success/Failed</li>
+            <li>User can click to view full output</li>
+        </ol>
+    </div>
+
+    <div class="section-card">
+        <h3>7.3 Debug Failed Execution</h3>
+        <ol>
+            <li>User sees failed execution in monitor</li>
+            <li>User clicks on failed row</li>
+            <li>Detail view shows:
+                <ul>
+                    <li>Original task/prompt</li>
+                    <li>Full stderr output</li>
+                    <li>Duration and timestamp</li>
+                </ul>
+            </li>
+            <li>User identifies issue (e.g., MCP server auth expired)</li>
+            <li>User fixes issue (refreshes auth)</li>
+            <li>User clicks "Re-run"</li>
+            <li>New execution starts</li>
+            <li>Success - user verifies output</li>
+        </ol>
+    </div>
+
+    <hr>
+
+    <h2 id="milestones">8. Milestones and Phases</h2>
+
+    <div class="section-card">
+        <h3>Phase 1: Foundation (MVP)</h3>
+        <p><strong>Scope:</strong></p>
+        <ul>
+            <li>Agent List View (read-only)</li>
+            <li>Basic Agent Editor (SKILL.md only)</li>
+            <li>Manual Trigger with task input</li>
+            <li>Simple execution history</li>
+        </ul>
+        <p><strong>Deliverables:</strong></p>
+        <ul class="checkbox-list">
+            <li>Flask API endpoints for agent CRUD</li>
+            <li>React app skeleton with routing</li>
+            <li>Agent list component</li>
+            <li>SKILL.md editor with save</li>
+            <li>Run agent modal</li>
+            <li>Basic execution list</li>
+        </ul>
+    </div>
+
+    <div class="section-card">
+        <h3>Phase 2: Full CRUD</h3>
+        <p><strong>Scope:</strong></p>
+        <ul>
+            <li>config.json editor</li>
+            <li>Agent creation wizard</li>
+            <li>Agent deletion with confirmation</li>
+            <li>MCP server assignment</li>
+        </ul>
+    </div>
+
+    <div class="section-card">
+        <h3>Phase 3: Monitoring</h3>
+        <p><strong>Scope:</strong></p>
+        <ul>
+            <li>Enhanced execution monitor</li>
+            <li>Execution detail view</li>
+            <li>Re-run capability</li>
+            <li>Basic dashboard</li>
+        </ul>
+    </div>
+
+    <div class="section-card">
+        <h3>Phase 4: Polish</h3>
+        <p><strong>Scope:</strong></p>
+        <ul>
+            <li>MCP server health checks</li>
+            <li>WebSocket live updates</li>
+            <li>Markdown preview</li>
+            <li>Diff view for edits</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2 id="questions">9. Open Questions</h2>
+    <table>
+        <thead>
+            <tr><th>Question</th><th>Status</th><th>Decision</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Use React or Vue?</td><td style="color:green;">Decided</td><td>React (per DESIGN.md)</td></tr>
+            <tr><td>Include auth in MVP?</td><td style="color:orange;">Open</td><td>Defer - local-only for MVP</td></tr>
+            <tr><td>Store execution history in DB?</td><td style="color:orange;">Open</td><td>Start with filesystem JSON</td></tr>
+            <tr><td>Support agent versioning?</td><td style="color:gray;">Deferred</td><td>Not in scope for v1</td></tr>
+            <tr><td>Allow SKILL.md templates?</td><td style="color:orange;">Open</td><td>Nice to have for Phase 2</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="metrics">10. Success Metrics</h2>
+    <table>
+        <thead>
+            <tr><th>Metric</th><th>Baseline</th><th>Target</th><th>Measurement</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Agent creation time</td><td>15 min (CLI)</td><td>5 min (UI)</td><td>User testing</td></tr>
+            <tr><td>Execution visibility</td><td>0% tracked</td><td>100% tracked</td><td>Audit log</td></tr>
+            <tr><td>Failed execution resolution</td><td>30 min</td><td>10 min</td><td>Support tickets</td></tr>
+            <tr><td>User adoption</td><td>1 (admin only)</td><td>3+ board members</td><td>Usage logs</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="appendix">11. Appendix</h2>
+
+    <h3>A. Wireframes Reference</h3>
+    <p>See <code>DESIGN.md</code> for component sketches and React component structure.</p>
+
+    <h3>B. API Documentation</h3>
+    <p>Full API spec to be generated from Flask routes using OpenAPI/Swagger.</p>
+
+    <h3>C. Related Documents</h3>
+    <ul>
+        <li><code>Orchestrator/DESIGN.md</code> - Technical architecture and code samples</li>
+        <li><code>Manager/SKILL.md</code> - Agent discovery and lifecycle management</li>
+        <li><code>~/.claude/settings.json</code> - MCP server configuration source</li>
+    </ul>
+
+    <hr>
+
+    <footer style="text-align:center;color:#666;margin-top:40px;">
+        <p>Claude Agents Orchestrator - Product Requirements Document v1.0</p>
+        <p>Generated: January 2026</p>
+    </footer>
+</body>
+</html>

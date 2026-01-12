@@ -5,7 +5,8 @@
 
   "mcp_servers": [
     "google-docs",
-    "gdrive"
+    "gdrive",
+    "gmail-personal"
   ],
 
   "trigger": {
@@ -58,6 +59,14 @@
       "enabled": true,
       "description": "Can handoff to Presentation agent for stakeholder decks"
     }
+  },
+
+  "email_review": {
+    "enabled": true,
+    "description": "Asynchronous document review via formatted HTML emails",
+    "input_style": "text-based",
+    "max_decisions_per_email": 10,
+    "version_on_feedback": true
   },
 
   "session": {
