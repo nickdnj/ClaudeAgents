@@ -248,7 +248,7 @@ def delete_agent(folder: str):
 @agents_bp.route('/agents/<folder>/execute', methods=['POST'])
 def execute_agent(folder: str):
     """
-    Execute an agent with a task.
+    Execute an agent with a task (async - returns immediately).
 
     Args:
         folder: Agent folder name
@@ -258,7 +258,7 @@ def execute_agent(folder: str):
         - timeout: Execution timeout in seconds (optional)
 
     Returns:
-        Execution record
+        Execution record with status 'running'
     """
     data = request.get_json()
 
@@ -293,16 +293,28 @@ def execute_agent(folder: str):
         triggered_by='manual'
     )
 
-    # Execute synchronously for now (async in Phase 2)
+    # Capture values needed for background thread
+    execution_id = execution.id
+    db_path = current_app.config['DATABASE_PATH']
+
+    def on_complete(result):
+        """Callback when execution finishes - runs in background thread."""
+        from app.models.database import init_db
+        # Re-initialize DB connection for this thread
+        init_db(db_path)
+        exec_record = Execution.get_by_id(execution_id)
+        if exec_record:
+            if result.success:
+                exec_record.complete(result.output)
+            else:
+                exec_record.fail(result.error or 'Unknown error')
+
+    # Execute asynchronously in background thread
     executor = get_executor()
-    result = executor.execute(folder, task)
+    executor.execute_async(folder, task, on_complete)
 
-    if result.success:
-        execution.complete(result.output)
-    else:
-        execution.fail(result.error or 'Unknown error')
-
-    return jsonify(execution.to_dict())
+    # Return immediately with 'running' status
+    return jsonify(execution.to_dict()), 202
 
 
 # ============================================================================

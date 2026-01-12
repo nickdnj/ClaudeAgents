@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { X, Play, Loader2, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 import type { Agent, Execution } from '../../api/client';
 import { agentsApi } from '../../api/client';
 
@@ -10,7 +10,7 @@ interface RunAgentModalProps {
   onClose: () => void;
 }
 
-type Status = 'idle' | 'running' | 'success' | 'error';
+type Status = 'idle' | 'submitting' | 'started' | 'error';
 
 export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
   const navigate = useNavigate();
@@ -22,16 +22,14 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
   const handleRun = async () => {
     if (!task.trim()) return;
 
-    setStatus('running');
+    setStatus('submitting');
     setError(null);
 
     try {
       const result = await agentsApi.execute(agent.folder, task);
       setExecution(result);
-      setStatus(result.status === 'success' ? 'success' : 'error');
-      if (result.status !== 'success') {
-        setError(result.error || 'Execution failed');
-      }
+      // Execution now runs in background - API returns immediately with 'running' status
+      setStatus('started');
     } catch (err) {
       setStatus('error');
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -46,12 +44,6 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
     onClose();
   };
 
-  const handleViewExecution = () => {
-    if (execution) {
-      navigate(`/executions/${execution.id}`);
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -59,7 +51,7 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={status === 'running' ? undefined : handleClose}
+        onClick={status === 'submitting' ? undefined : handleClose}
       />
 
       {/* Modal */}
@@ -69,7 +61,7 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
           <h3 className="text-xl font-semibold text-gray-900">Run Agent</h3>
           <button
             onClick={handleClose}
-            disabled={status === 'running'}
+            disabled={status === 'submitting'}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5 text-gray-500" />
@@ -104,29 +96,24 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
             </>
           )}
 
-          {status === 'running' && (
+          {status === 'submitting' && (
             <div className="text-center py-8">
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-              <p className="text-lg font-medium text-gray-900">Running agent...</p>
-              <p className="text-sm text-gray-500 mt-2">This may take a few minutes</p>
+              <p className="text-lg font-medium text-gray-900">Starting agent...</p>
+              <p className="text-sm text-gray-500 mt-2">Please wait</p>
             </div>
           )}
 
-          {status === 'success' && (
+          {status === 'started' && (
             <div className="text-center py-8">
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <p className="text-lg font-medium text-gray-900">Execution Complete</p>
+              <p className="text-lg font-medium text-gray-900">Agent Started!</p>
               <p className="text-sm text-gray-500 mt-2">
-                Duration: {execution?.duration_seconds?.toFixed(1)}s
+                The agent is now running in the background.
               </p>
-              {execution?.output && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg text-left">
-                  <p className="text-xs font-medium text-gray-500 mb-2">Output Preview</p>
-                  <p className="text-sm text-gray-700 line-clamp-4 whitespace-pre-wrap">
-                    {execution.output}
-                  </p>
-                </div>
-              )}
+              <p className="text-sm text-gray-500 mt-1">
+                Execution ID: <code className="bg-gray-100 px-2 py-0.5 rounded">{execution?.id}</code>
+              </p>
             </div>
           )}
 
@@ -157,16 +144,32 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
             </>
           )}
 
-          {(status === 'success' || status === 'error') && (
+          {status === 'started' && (
             <>
               <button onClick={handleClose} className="btn btn-secondary">
                 Close
               </button>
-              {execution && (
-                <button onClick={handleViewExecution} className="btn btn-primary">
-                  View Details
-                </button>
-              )}
+              <button
+                onClick={() => navigate('/executions')}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Executions
+              </button>
+            </>
+          )}
+
+          {status === 'error' && (
+            <>
+              <button onClick={handleClose} className="btn btn-secondary">
+                Close
+              </button>
+              <button
+                onClick={() => setStatus('idle')}
+                className="btn btn-primary"
+              >
+                Try Again
+              </button>
             </>
           )}
         </div>
