@@ -1,0 +1,14 @@
+{
+  "name": "Marketing Content Creator",
+  "description": "Creates marketing collateral for the Orchestrator UI and Claude Agent Framework, including pitch decks, blog posts, social media content, and promotional materials.",
+  "version": "1.0.0",
+  "trigger": "on-demand",
+  "mcp_servers": [
+    "google-drive",
+    "google-docs-mcp",
+    "gmail-personal",
+    "voicemode",
+    "chrome",
+    "gmail"
+  ]
+}
