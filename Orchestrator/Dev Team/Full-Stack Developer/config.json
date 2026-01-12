@@ -1,0 +1,23 @@
+{
+  "name": "Full-Stack Developer",
+  "description": "Implements React frontend and Flask backend for the Orchestrator UI",
+  "version": "1.0.0",
+  "trigger": "on-demand",
+  "mcp_servers": [],
+  "settings": {
+    "tech_stack": {
+      "frontend": ["react", "typescript", "vite", "tailwindcss", "swr", "monaco-editor"],
+      "backend": ["flask", "python", "sqlite", "subprocess"]
+    },
+    "code_standards": {
+      "typescript": "strict",
+      "python": "pep8",
+      "test_coverage": "80%"
+    }
+  },
+  "context_files": [
+    "Orchestrator/PRD.md",
+    "Orchestrator/SAD.md",
+    "Orchestrator/UXD.md"
+  ]
+}

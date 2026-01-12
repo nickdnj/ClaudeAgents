@@ -389,72 +389,111 @@ YOUR CHOICE: ___
 
 ### Email Review Template Structure
 
+All Orchestrator document reviews use a consistent HTML email format:
+
 ```html
 <!DOCTYPE html>
 <html>
 <head>
     <style>
-        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; }
+        /* === ORCHESTRATOR STANDARD EMAIL TEMPLATE === */
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+               max-width: 750px; margin: 0 auto; line-height: 1.6; color: #333; }
+        h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+
+        /* Instructions box */
+        .instructions { background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; }
+
+        /* Question/decision blocks */
         .question { background: #f8f9fa; border-left: 4px solid #1a5f7a;
                     padding: 20px; margin: 20px 0; }
+
+        /* User input areas - yellow dashed border */
         .input-box { background: #fffef0; border: 2px dashed #e0c050;
-                     padding: 12px; margin: 10px 0; }
-        .option { margin: 12px 0; padding: 10px; background: white;
-                  border: 1px solid #ddd; }
+                     padding: 12px; margin: 10px 0; min-height: 20px; }
+
+        /* Option cards */
+        .option { margin: 12px 0; padding: 12px; background: white;
+                  border: 1px solid #ddd; border-radius: 4px; }
+
+        /* Document-specific highlight: PRD decisions (purple) */
+        .prd { background: #f5f0ff; border-left: 4px solid #8e44ad;
+               padding: 15px; margin: 15px 0; }
+
+        /* Tables */
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+
+        /* Section headers */
+        .section { background: #1a5f7a; color: white; padding: 10px 15px; margin: 30px 0 20px 0; }
+
+        em { color: #666; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
     </style>
 </head>
 <body>
 
-<h1>📝 [Document Title] - Review Form</h1>
+<h1>📝 Product Requirements Review: [Project Name] v[X.Y]</h1>
 
 <div class="instructions">
-    <h3>How to Complete:</h3>
+    <h3>📋 How to Review:</h3>
     <ul>
-        <li>Type your selection in the yellow boxes</li>
+        <li>Type your selection in the <strong>yellow boxes</strong></li>
         <li>For multiple choice, type the letter (A, B, C)</li>
         <li>Add notes directly below questions</li>
-        <li>Reply to this email when done</li>
+        <li><strong>Reply to this email when done</strong></li>
     </ul>
 </div>
 
-<h2>🔧 Section 1: Key Decisions</h2>
+<div class="section">🎯 SCOPE DECISIONS</div>
 
-<div class="question">
-    <div class="question-title">1. [Decision Topic]</div>
+<div class="prd">
+    <strong>[Decision Topic]</strong>
     <p>[Context for the decision]</p>
     <div class="option"><strong>A) [Option A]</strong><br>[Description]</div>
     <div class="option"><strong>B) [Option B]</strong><br>[Description]</div>
-    <div class="option"><strong>C) [Option C]</strong><br>[Description]</div>
+    <p><em>Recommendation: [Your recommendation]</em></p>
     <div class="input-box">YOUR CHOICE: </div>
 </div>
 
-<h2>📊 Section 2: Priority Review</h2>
+<div class="section">📊 FEATURE PRIORITIES</div>
 
 <table>
-    <tr><th>Feature</th><th>Priority</th><th>Your Input</th></tr>
-    <tr><td>Feature 1</td><td>P0</td><td class="input-box"></td></tr>
-    <tr><td>Feature 2</td><td>P1</td><td class="input-box"></td></tr>
+    <tr><th>Feature</th><th>Proposed Priority</th><th>Approve? (Y/N/Change)</th></tr>
+    <tr><td>Feature 1</td><td>P0 - Critical</td><td class="input-box"></td></tr>
+    <tr><td>Feature 2</td><td>P1 - Important</td><td class="input-box"></td></tr>
 </table>
 
-<h2>❓ Section 3: Open Questions</h2>
+<div class="section">❓ OPEN QUESTIONS</div>
 
 <div class="question">
-    <div class="question-title">[Question]</div>
+    <strong>[Question needing resolution]</strong>
     <div class="input-box">YOUR ANSWER: </div>
 </div>
 
-<h2>✅ Final Approval</h2>
+<div class="section">✅ FINAL APPROVAL</div>
 
 <div class="question">
-    <div class="option"><strong>A) Approved</strong> — Proceed</div>
-    <div class="option"><strong>B) Needs revision</strong> — Update first</div>
-    <div class="option"><strong>C) Major changes</strong> — Discuss further</div>
+    <div class="option"><strong>A) Approved</strong> — PRD is ready for architecture design</div>
+    <div class="option"><strong>B) Approved with notes</strong> — Proceed but address comments</div>
+    <div class="option"><strong>C) Needs revision</strong> — Significant changes required</div>
     <div class="input-box">DECISION: </div>
 </div>
 
 </body>
 </html>
 ```
+
+**Note:** This template is consistent with Software Architecture (SAD) and UX Design (UXD) review emails. Key shared elements:
+- Same CSS base styles and color scheme
+- `.instructions` box with review instructions
+- `.section` headers with emoji icons
+- `.input-box` yellow dashed areas for user input
+- `.option` cards for multiple choice
+- Final approval section with A/B/C options
+- Document-specific highlight class: `.prd` (purple), `.adr` (blue), `.ux` (green)
 
 ### Sending Review Emails
 

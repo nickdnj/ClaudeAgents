@@ -1,0 +1,26 @@
+{
+  "name": "QA Engineer",
+  "description": "Ensures quality through test planning, automation, and accessibility auditing",
+  "version": "1.0.0",
+  "trigger": "on-demand",
+  "mcp_servers": [],
+  "settings": {
+    "test_frameworks": {
+      "unit_frontend": "jest",
+      "unit_backend": "pytest",
+      "e2e": "playwright",
+      "accessibility": "axe-core"
+    },
+    "coverage_targets": {
+      "unit": "80%",
+      "integration": "60%",
+      "e2e": "critical_paths"
+    },
+    "accessibility_standard": "WCAG 2.1 AA"
+  },
+  "context_files": [
+    "Orchestrator/PRD.md",
+    "Orchestrator/SAD.md",
+    "Orchestrator/UXD.md"
+  ]
+}

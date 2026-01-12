@@ -1,0 +1,29 @@
+{
+  "name": "DevOps Engineer",
+  "description": "Manages deployment, infrastructure, security, and reliability of Orchestrator",
+  "version": "1.0.0",
+  "trigger": "on-demand",
+  "mcp_servers": [],
+  "settings": {
+    "infrastructure": {
+      "service_manager": "launchd",
+      "platform": "macos",
+      "backend_port": 5111,
+      "frontend_dev_port": 5173
+    },
+    "security": {
+      "input_validation": true,
+      "path_traversal_protection": true,
+      "subprocess_safety": true,
+      "rate_limiting": true
+    },
+    "monitoring": {
+      "log_path": "~/.orchestrator/logs",
+      "health_endpoint": "/api/health"
+    }
+  },
+  "context_files": [
+    "Orchestrator/SAD.md",
+    "Orchestrator/PRD.md"
+  ]
+}

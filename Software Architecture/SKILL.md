@@ -529,6 +529,182 @@ Commit architecture docs to `/docs/architecture/`:
 
 For collaboration and review, also maintain in Google Docs with rich formatting.
 
+---
+
+## Email Review Workflow
+
+For asynchronous document review, use the email-based review pattern. This allows stakeholders to review architecture decisions and provide feedback on their own schedule.
+
+### When to Use Email Review
+
+- Architecture has key decision points requiring stakeholder input
+- Technical trade-offs need business/product review
+- User needs time to consult with team or domain experts
+- Document has open questions that need resolution
+
+### Email Review Format
+
+**IMPORTANT:** HTML checkboxes do NOT survive email replies. Use text-based inputs:
+
+```html
+<!-- DO NOT USE - Checkboxes don't persist -->
+<input type="checkbox"> Option A
+
+<!-- USE THIS INSTEAD - Text inputs that survive replies -->
+YOUR CHOICE: _______________
+
+<!-- Or lettered options -->
+A) First option
+B) Second option
+C) Third option
+
+YOUR CHOICE: ___
+```
+
+### Email Review Template Structure
+
+All Orchestrator document reviews use a consistent HTML email format:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* === ORCHESTRATOR STANDARD EMAIL TEMPLATE === */
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+               max-width: 750px; margin: 0 auto; line-height: 1.6; color: #333; }
+        h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+
+        /* Instructions box */
+        .instructions { background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; }
+
+        /* Question/decision blocks */
+        .question { background: #f8f9fa; border-left: 4px solid #1a5f7a;
+                    padding: 20px; margin: 20px 0; }
+
+        /* User input areas - yellow dashed border */
+        .input-box { background: #fffef0; border: 2px dashed #e0c050;
+                     padding: 12px; margin: 10px 0; min-height: 20px; }
+
+        /* Option cards */
+        .option { margin: 12px 0; padding: 12px; background: white;
+                  border: 1px solid #ddd; border-radius: 4px; }
+
+        /* Document-specific highlight: Architecture decisions (blue) */
+        .adr { background: #f0f7ff; border-left: 4px solid #2980b9;
+               padding: 15px; margin: 15px 0; }
+
+        /* Tables */
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+
+        /* Section headers */
+        .section { background: #1a5f7a; color: white; padding: 10px 15px; margin: 30px 0 20px 0; }
+
+        em { color: #666; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<h1>🏗️ Software Architecture Review: [Project Name] v[X.Y]</h1>
+
+<div class="instructions">
+    <h3>📋 How to Review:</h3>
+    <ul>
+        <li>Type your selection in the <strong>yellow boxes</strong></li>
+        <li>For multiple choice, type the letter (A, B, C)</li>
+        <li>Add notes directly below questions</li>
+        <li><strong>Reply to this email when done</strong></li>
+    </ul>
+</div>
+
+<div class="section">🔧 ARCHITECTURAL DECISIONS</div>
+
+<div class="adr">
+    <strong>ADR-001: [Decision Topic]</strong>
+    <p>[Context and why this decision matters]</p>
+    <div class="option"><strong>A) [Option A]</strong><br>[Pros/Cons]</div>
+    <div class="option"><strong>B) [Option B]</strong><br>[Pros/Cons]</div>
+    <p><em>Recommendation: [Your recommendation with rationale]</em></p>
+    <div class="input-box">YOUR CHOICE: </div>
+</div>
+
+<div class="section">📊 TECHNOLOGY STACK</div>
+
+<table>
+    <tr><th>Layer</th><th>Proposed</th><th>Approve? (Y/N/Change)</th></tr>
+    <tr><td>Frontend</td><td>React + TypeScript</td><td class="input-box"></td></tr>
+    <tr><td>Backend</td><td>Python + Flask</td><td class="input-box"></td></tr>
+    <tr><td>Database</td><td>SQLite</td><td class="input-box"></td></tr>
+</table>
+
+<div class="section">❓ OPEN QUESTIONS</div>
+
+<div class="question">
+    <strong>[Question needing resolution]</strong>
+    <div class="input-box">YOUR ANSWER: </div>
+</div>
+
+<div class="section">✅ FINAL APPROVAL</div>
+
+<div class="question">
+    <div class="option"><strong>A) Approved</strong> — Architecture is ready for implementation</div>
+    <div class="option"><strong>B) Approved with notes</strong> — Proceed but address comments</div>
+    <div class="option"><strong>C) Needs revision</strong> — Significant changes required</div>
+    <div class="input-box">DECISION: </div>
+</div>
+
+</body>
+</html>
+```
+
+**Note:** This template is consistent with Product Requirements (PRD) and UX Design (UXD) review emails. Key shared elements:
+- Same CSS base styles and color scheme
+- `.instructions` box with review instructions
+- `.section` headers with emoji icons
+- `.input-box` yellow dashed areas for user input
+- `.option` cards for multiple choice
+- Final approval section with A/B/C options
+- Document-specific highlight class: `.prd` (purple), `.adr` (blue), `.ux` (green)
+
+### Sending Review Emails
+
+1. **Create the architecture doc first** - Complete the initial draft
+2. **Identify decision points** - List ADRs and open technical questions
+3. **Format as HTML email** - Use the template above with text inputs
+4. **Send via Gmail MCP** - Use `mimeType: "text/html"` for proper rendering
+5. **Wait for reply** - User fills in choices and replies
+6. **Search for response** - Find the reply email and parse inputs
+7. **Update document** - Incorporate feedback into architecture doc
+
+### Parsing Email Responses
+
+When reading the reply email, look for patterns like:
+- `YOUR CHOICE: A` or `YOUR CHOICE: B`
+- `DECISION: Approved`
+- `Y` or `N` in table cells
+- Text entered after `YOUR ANSWER:` or in input areas
+- Any freeform notes added by the user
+
+### Version Workflow
+
+1. **v0.1** - Initial architecture draft sent for review
+2. **v0.2** - Updated based on first round of feedback
+3. **v0.N** - Continue iterations until approved
+4. **v1.0** - Final approved version, ready for implementation
+
+### Email Review Best Practices
+
+- **Highlight trade-offs** - Show pros/cons clearly for each decision
+- **Provide recommendations** - Don't just present options, recommend one
+- **Include diagrams** - Reference attached diagrams or inline ASCII
+- **Limit scope** - 5-10 decision points max per review email
+- **Link to full docs** - Provide link to complete architecture doc
+- **Set expectations** - Tell user what happens after they reply
+
 ## Integration Points
 
 ### From Product Requirements Agent

@@ -615,6 +615,215 @@ When UX spec is complete, offer:
 - Create style guide documentation
 - Provide design-to-code mappings
 
+---
+
+## Email Review Workflow
+
+For asynchronous design review, use the email-based review pattern. This allows stakeholders to review UX decisions and provide feedback on their own schedule.
+
+### When to Use Email Review
+
+- UX spec has design decisions requiring stakeholder input
+- User flows need business validation
+- Navigation patterns need user preference input
+- User needs time to review wireframes with team
+
+### Email Review Format
+
+**IMPORTANT:** HTML checkboxes do NOT survive email replies. Use text-based inputs:
+
+```html
+<!-- DO NOT USE - Checkboxes don't persist -->
+<input type="checkbox"> Option A
+
+<!-- USE THIS INSTEAD - Text inputs that survive replies -->
+YOUR CHOICE: _______________
+
+<!-- Or lettered options -->
+A) First option
+B) Second option
+C) Third option
+
+YOUR CHOICE: ___
+```
+
+### Email Review Template Structure
+
+All Orchestrator document reviews use a consistent HTML email format:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* === ORCHESTRATOR STANDARD EMAIL TEMPLATE === */
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+               max-width: 750px; margin: 0 auto; line-height: 1.6; color: #333; }
+        h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+
+        /* Instructions box */
+        .instructions { background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; }
+
+        /* Question/decision blocks */
+        .question { background: #f8f9fa; border-left: 4px solid #1a5f7a;
+                    padding: 20px; margin: 20px 0; }
+
+        /* User input areas - yellow dashed border */
+        .input-box { background: #fffef0; border: 2px dashed #e0c050;
+                     padding: 12px; margin: 10px 0; min-height: 20px; }
+
+        /* Option cards */
+        .option { margin: 12px 0; padding: 12px; background: white;
+                  border: 1px solid #ddd; border-radius: 4px; }
+
+        /* Document-specific highlight: UX decisions (green) */
+        .ux { background: #f0fff4; border-left: 4px solid #27ae60;
+              padding: 15px; margin: 15px 0; }
+
+        /* Wireframe display */
+        .wireframe { background: #f5f5f5; border: 1px solid #ccc;
+                     padding: 15px; margin: 15px 0; font-family: monospace;
+                     white-space: pre; font-size: 12px; }
+
+        /* Tables */
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+
+        /* Section headers */
+        .section { background: #1a5f7a; color: white; padding: 10px 15px; margin: 30px 0 20px 0; }
+
+        em { color: #666; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<h1>🎨 UX Design Review: [Project Name] v[X.Y]</h1>
+
+<div class="instructions">
+    <h3>📋 How to Review:</h3>
+    <ul>
+        <li>Type your selection in the <strong>yellow boxes</strong></li>
+        <li>For multiple choice, type the letter (A, B, C)</li>
+        <li>Add notes directly below wireframes</li>
+        <li><strong>Reply to this email when done</strong></li>
+    </ul>
+</div>
+
+<div class="section">🧭 NAVIGATION DESIGN</div>
+
+<div class="ux">
+    <strong>Primary Navigation Pattern</strong>
+    <div class="option"><strong>A) Bottom Tab Bar</strong><br>
+    Thumb-friendly, always visible, limited to 5 items</div>
+    <div class="option"><strong>B) Sidebar Navigation</strong><br>
+    More items, desktop-optimized, collapsible on mobile</div>
+    <div class="option"><strong>C) Top Navigation</strong><br>
+    Traditional, familiar, works well with breadcrumbs</div>
+    <p><em>Recommendation: A for mobile-first approach</em></p>
+    <div class="input-box">YOUR CHOICE: </div>
+</div>
+
+<div class="section">📐 WIREFRAME REVIEW</div>
+
+<div class="ux">
+    <strong>Dashboard Layout</strong>
+    <div class="wireframe">
+┌────────────────────────────────────┐
+│           Header Bar               │
+├────────────────────────────────────┤
+│  [Stats Cards]                     │
+│  ┌──────┐ ┌──────┐ ┌──────┐       │
+│  │  12  │ │  47  │ │   3  │       │
+│  └──────┘ └──────┘ └──────┘       │
+├────────────────────────────────────┤
+│  [Recent Activity List]            │
+│  • Item 1                          │
+│  • Item 2                          │
+│  • Item 3                          │
+└────────────────────────────────────┘
+    </div>
+    <p>Does this layout work for your needs?</p>
+    <div class="input-box">FEEDBACK: </div>
+</div>
+
+<div class="section">🎨 COMPONENT PREFERENCES</div>
+
+<table>
+    <tr><th>Component</th><th>Proposed Style</th><th>Approve? (Y/N/Change)</th></tr>
+    <tr><td>Buttons</td><td>Rounded corners, solid fill</td><td class="input-box"></td></tr>
+    <tr><td>Cards</td><td>Subtle shadow, 8px radius</td><td class="input-box"></td></tr>
+    <tr><td>Forms</td><td>Floating labels, inline validation</td><td class="input-box"></td></tr>
+</table>
+
+<div class="section">❓ OPEN QUESTIONS</div>
+
+<div class="question">
+    <strong>[Question needing resolution]</strong>
+    <div class="input-box">YOUR ANSWER: </div>
+</div>
+
+<div class="section">✅ FINAL APPROVAL</div>
+
+<div class="question">
+    <div class="option"><strong>A) Approved</strong> — UX design is ready for implementation</div>
+    <div class="option"><strong>B) Approved with notes</strong> — Proceed but address comments</div>
+    <div class="option"><strong>C) Needs revision</strong> — Significant changes required</div>
+    <div class="input-box">DECISION: </div>
+</div>
+
+</body>
+</html>
+```
+
+**Note:** This template is consistent with Product Requirements (PRD) and Software Architecture (SAD) review emails. Key shared elements:
+- Same CSS base styles and color scheme
+- `.instructions` box with review instructions
+- `.section` headers with emoji icons
+- `.input-box` yellow dashed areas for user input
+- `.option` cards for multiple choice
+- Final approval section with A/B/C options
+- Document-specific highlight class: `.prd` (purple), `.adr` (blue), `.ux` (green)
+- UX-specific: `.wireframe` for ASCII art wireframe display
+
+### Sending Review Emails
+
+1. **Create the UX spec first** - Complete wireframes and interaction specs
+2. **Identify decision points** - List navigation, layout, and component choices
+3. **Include wireframes** - Use ASCII art wireframes in the email
+4. **Format as HTML email** - Use `mimeType: "text/html"` for proper rendering
+5. **Send via Gmail MCP** - Include links to full spec documents
+6. **Wait for reply** - User fills in choices and replies
+7. **Search for response** - Find the reply email and parse inputs
+8. **Update document** - Incorporate feedback into UX spec
+
+### Parsing Email Responses
+
+When reading the reply email, look for patterns like:
+- `YOUR CHOICE: A` or `YOUR CHOICE: B`
+- `DECISION: Approved`
+- `Y` or `N` in table cells
+- Text entered after `FEEDBACK:` or `YOUR ANSWER:`
+- Any freeform notes added below wireframes
+
+### Version Workflow
+
+1. **v0.1** - Initial UX spec draft sent for review
+2. **v0.2** - Updated based on first round of feedback
+3. **v0.N** - Continue iterations until approved
+4. **v1.0** - Final approved version, ready for implementation
+
+### Email Review Best Practices
+
+- **Show wireframes** - Include ASCII wireframes directly in email
+- **Provide recommendations** - Don't just present options, recommend one
+- **Reference full spec** - Link to complete UX document for detail
+- **Limit scope** - 5-10 decision points max per review email
+- **Be visual** - Use tables, layouts, and formatting to communicate
+- **Set expectations** - Tell user what happens after they reply
+
 ## Integration Points
 
 ### From Product Requirements Agent
