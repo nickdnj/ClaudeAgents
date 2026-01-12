@@ -6,6 +6,7 @@
   },
   "mcp_servers": [
     "gmail",
-    "gmail-personal"
+    "gmail-personal",
+    "voicemode"
   ]
 }
