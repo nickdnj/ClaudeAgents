@@ -16,6 +16,7 @@ class ExecutionResult:
     output: str
     error: Optional[str] = None
     return_code: int = 0
+    pid: Optional[int] = None
 
 
 class ClaudeExecutor:
@@ -180,7 +181,8 @@ Execute this task according to your SKILL.md instructions."""
             )
 
     def execute_async(self, agent_folder: str, task: str,
-                      on_complete: Callable[[ExecutionResult], None]) -> threading.Thread:
+                      on_complete: Callable[[ExecutionResult], None],
+                      on_pid: Optional[Callable[[int], None]] = None) -> threading.Thread:
         """
         Execute an agent asynchronously in a background thread.
 
@@ -188,14 +190,114 @@ Execute this task according to your SKILL.md instructions."""
             agent_folder: Name of the agent folder
             task: Task description
             on_complete: Callback when execution completes
+            on_pid: Optional callback with PID when process starts
 
         Returns:
             The thread running the execution
         """
-        thread = threading.Thread(
-            target=self.execute,
-            args=(agent_folder, task, on_complete),
-            daemon=True
-        )
+        def run_with_pid():
+            agent_path = self.agents_root / agent_folder
+
+            if not agent_path.exists():
+                on_complete(ExecutionResult(
+                    success=False,
+                    output='',
+                    error=f"Agent folder '{agent_folder}' not found",
+                    return_code=-1
+                ))
+                return
+
+            skill_path = agent_path / 'SKILL.md'
+            if not skill_path.exists():
+                on_complete(ExecutionResult(
+                    success=False,
+                    output='',
+                    error=f"SKILL.md not found in '{agent_folder}'",
+                    return_code=-1
+                ))
+                return
+
+            try:
+                # Build the command
+                cmd = [
+                    self.claude_cli_path,
+                    '--print',
+                    '--output-format', 'text',
+                    '--verbose',
+                    '--dangerously-skip-permissions',
+                ]
+
+                # Add MCP server configs if agent requires them
+                required_mcp = self._get_agent_mcp_servers(agent_path)
+                if required_mcp:
+                    mcp_config_json = self._build_mcp_config_arg(required_mcp)
+                    if mcp_config_json:
+                        cmd.extend(['--mcp-config', mcp_config_json])
+
+                # Build the prompt including the SKILL context
+                skill_content = skill_path.read_text()
+                full_prompt = f"""You are executing as the agent defined in SKILL.md below.
+
+<skill>
+{skill_content}
+</skill>
+
+Task: {task}
+
+Execute this task according to your SKILL.md instructions."""
+
+                # Use Popen to get the PID immediately
+                process = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    cwd=str(agent_path)
+                )
+
+                # Notify caller of PID
+                if on_pid:
+                    on_pid(process.pid)
+
+                # Wait for completion with timeout
+                try:
+                    stdout, stderr = process.communicate(input=full_prompt, timeout=self.timeout)
+                    execution_result = ExecutionResult(
+                        success=process.returncode == 0,
+                        output=stdout,
+                        error=stderr if process.returncode != 0 else None,
+                        return_code=process.returncode,
+                        pid=process.pid
+                    )
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.communicate()  # Clean up
+                    execution_result = ExecutionResult(
+                        success=False,
+                        output='',
+                        error=f"Execution timed out after {self.timeout} seconds",
+                        return_code=-2,
+                        pid=process.pid
+                    )
+
+                on_complete(execution_result)
+
+            except FileNotFoundError:
+                on_complete(ExecutionResult(
+                    success=False,
+                    output='',
+                    error=f"Claude CLI not found at '{self.claude_cli_path}'",
+                    return_code=-3
+                ))
+            except Exception as e:
+                on_complete(ExecutionResult(
+                    success=False,
+                    output='',
+                    error=str(e),
+                    return_code=-4
+                ))
+
+        thread = threading.Thread(target=run_with_pid, daemon=True)
         thread.start()
         return thread

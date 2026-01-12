@@ -5,6 +5,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import Optional
 import uuid
+import os
 
 from app.models.database import get_db
 
@@ -22,6 +23,7 @@ class Execution:
     completed_at: Optional[str] = None
     duration_seconds: Optional[float] = None
     triggered_by: str = 'manual'
+    pid: Optional[int] = None
 
     @classmethod
     def create(cls, agent_folder: str, task: str, triggered_by: str = 'manual') -> 'Execution':
@@ -42,12 +44,12 @@ class Execution:
         db = get_db()
         db.execute('''
             INSERT OR REPLACE INTO executions
-            (id, agent_folder, task, status, output, error, started_at, completed_at, duration_seconds, triggered_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (id, agent_folder, task, status, output, error, started_at, completed_at, duration_seconds, triggered_by, pid)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             self.id, self.agent_folder, self.task, self.status,
             self.output, self.error, self.started_at, self.completed_at,
-            self.duration_seconds, self.triggered_by
+            self.duration_seconds, self.triggered_by, self.pid
         ))
         db.commit()
 
@@ -72,6 +74,23 @@ class Execution:
             end = datetime.fromisoformat(self.completed_at)
             self.duration_seconds = (end - start).total_seconds()
         self.save()
+
+    def set_pid(self, pid: int):
+        """Set the process ID for this execution."""
+        self.pid = pid
+        db = get_db()
+        db.execute('UPDATE executions SET pid = ? WHERE id = ?', (pid, self.id))
+        db.commit()
+
+    def is_process_alive(self) -> bool:
+        """Check if the execution process is still running."""
+        if not self.pid:
+            return False
+        try:
+            os.kill(self.pid, 0)  # Signal 0 checks if process exists
+            return True
+        except (OSError, ProcessLookupError):
+            return False
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""

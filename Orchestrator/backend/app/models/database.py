@@ -38,13 +38,20 @@ def init_db(db_path: str):
             started_at TEXT NOT NULL,
             completed_at TEXT,
             duration_seconds REAL,
-            triggered_by TEXT DEFAULT 'manual'
+            triggered_by TEXT DEFAULT 'manual',
+            pid INTEGER
         );
 
         CREATE INDEX IF NOT EXISTS idx_executions_agent ON executions(agent_folder);
         CREATE INDEX IF NOT EXISTS idx_executions_status ON executions(status);
         CREATE INDEX IF NOT EXISTS idx_executions_started ON executions(started_at);
     ''')
+    # Add pid column if it doesn't exist (for existing databases)
+    try:
+        conn.execute('ALTER TABLE executions ADD COLUMN pid INTEGER')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     conn.commit()
     conn.close()
 

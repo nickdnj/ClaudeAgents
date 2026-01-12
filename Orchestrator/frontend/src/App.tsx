@@ -4,6 +4,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AgentsList } from './pages/AgentsList';
 import { AgentDetail } from './pages/AgentDetail';
 import { ExecutionsList } from './pages/ExecutionsList';
+import { ExecutionDetail } from './pages/ExecutionDetail';
 import { Schedules } from './pages/Schedules';
 import { MCPServers } from './pages/MCPServers';
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="agents" element={<AgentsList />} />
           <Route path="agents/:folder" element={<AgentDetail />} />
           <Route path="executions" element={<ExecutionsList />} />
+          <Route path="executions/:executionId" element={<ExecutionDetail />} />
           <Route path="schedules" element={<Schedules />} />
           <Route path="mcp-servers" element={<MCPServers />} />
         </Route>

@@ -64,6 +64,36 @@ def get_execution(execution_id: str):
     return jsonify(execution.to_dict())
 
 
+@executions_bp.route('/executions/<execution_id>/status', methods=['GET'])
+def get_execution_status(execution_id: str):
+    """
+    Get the live status of an execution, including whether the process is alive.
+
+    Args:
+        execution_id: Execution ID
+
+    Returns:
+        JSON with status, process_alive flag, and pid
+    """
+    execution = Execution.get_by_id(execution_id)
+
+    if not execution:
+        return jsonify({
+            'error': 'Execution not found',
+            'code': 'EXECUTION_NOT_FOUND'
+        }), 404
+
+    return jsonify({
+        'id': execution.id,
+        'status': execution.status,
+        'pid': execution.pid,
+        'process_alive': execution.is_process_alive() if execution.status == 'running' else False,
+        'started_at': execution.started_at,
+        'completed_at': execution.completed_at,
+        'duration_seconds': execution.duration_seconds
+    })
+
+
 @executions_bp.route('/executions/stats', methods=['GET'])
 def get_execution_stats():
     """

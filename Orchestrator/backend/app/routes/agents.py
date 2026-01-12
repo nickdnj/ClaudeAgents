@@ -297,21 +297,38 @@ def execute_agent(folder: str):
     execution_id = execution.id
     db_path = current_app.config['DATABASE_PATH']
 
+    def on_pid(pid: int):
+        """Callback when process starts - saves PID for status checking."""
+        from app.models.database import get_db_connection
+        # Use context manager for thread-safe DB access
+        with get_db_connection(db_path) as conn:
+            conn.execute('UPDATE executions SET pid = ? WHERE id = ?', (pid, execution_id))
+            conn.commit()
+
     def on_complete(result):
         """Callback when execution finishes - runs in background thread."""
-        from app.models.database import init_db
-        # Re-initialize DB connection for this thread
-        init_db(db_path)
-        exec_record = Execution.get_by_id(execution_id)
-        if exec_record:
+        from app.models.database import get_db_connection
+        # Use context manager for thread-safe DB access
+        with get_db_connection(db_path) as conn:
             if result.success:
-                exec_record.complete(result.output)
+                conn.execute('''
+                    UPDATE executions
+                    SET status = 'success', output = ?, completed_at = datetime('now'),
+                        duration_seconds = (julianday(datetime('now')) - julianday(started_at)) * 86400
+                    WHERE id = ?
+                ''', (result.output, execution_id))
             else:
-                exec_record.fail(result.error or 'Unknown error')
+                conn.execute('''
+                    UPDATE executions
+                    SET status = 'failed', error = ?, completed_at = datetime('now'),
+                        duration_seconds = (julianday(datetime('now')) - julianday(started_at)) * 86400
+                    WHERE id = ?
+                ''', (result.error or 'Unknown error', execution_id))
+            conn.commit()
 
     # Execute asynchronously in background thread
     executor = get_executor()
-    executor.execute_async(folder, task, on_complete)
+    executor.execute_async(folder, task, on_complete, on_pid)
 
     # Return immediately with 'running' status
     return jsonify(execution.to_dict()), 202

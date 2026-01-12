@@ -32,6 +32,17 @@ export interface Execution {
   completed_at: string | null;
   duration_seconds: number | null;
   triggered_by: string;
+  pid?: number | null;
+}
+
+export interface ExecutionStatus {
+  id: string;
+  status: 'running' | 'success' | 'failed' | 'timeout';
+  pid: number | null;
+  process_alive: boolean;
+  started_at: string;
+  completed_at: string | null;
+  duration_seconds: number | null;
 }
 
 export interface ExecutionStats {
@@ -128,6 +139,8 @@ export const executionsApi = {
   },
 
   get: (id: string) => request<Execution>(`/api/executions/${encodeURIComponent(id)}`),
+
+  status: (id: string) => request<ExecutionStatus>(`/api/executions/${encodeURIComponent(id)}/status`),
 
   stats: (hours?: number) => request<ExecutionStats>(`/api/executions/stats${hours ? `?hours=${hours}` : ''}`),
 };
