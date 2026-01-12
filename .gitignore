@@ -1,1 +1,17 @@
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Node
+node_modules/
+dist/
+*.log
+
+# Orchestrator
+Orchestrator/backend/venv/
+Orchestrator/frontend/node_modules/
+Orchestrator/frontend/dist/

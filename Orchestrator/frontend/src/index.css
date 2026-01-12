@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/* Custom theme configuration */
+@theme {
+  --color-primary-50: #f0f7fa;
+  --color-primary-100: #e0eff4;
+  --color-primary-200: #b8dde8;
+  --color-primary-300: #7fc3d8;
+  --color-primary-400: #40a4c2;
+  --color-primary-500: #1a5f7a;
+  --color-primary-600: #165068;
+  --color-primary-700: #134156;
+  --color-primary-800: #103545;
+  --color-primary-900: #0d2a38;
+  --color-primary: #1a5f7a;
+}
+
+/* Custom base styles */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+/* Custom component classes */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-600;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition-colors;
+  }
+
+  .input:focus {
+    @apply ring-2 ring-primary border-primary;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .badge-gray {
+    @apply bg-gray-100 text-gray-700;
+  }
+}
