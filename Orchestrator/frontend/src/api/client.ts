@@ -124,6 +124,12 @@ export const agentsApi = {
     request<Array<{ hash: string; author_name: string; date: string; message: string }>>(
       `/api/agents/${encodeURIComponent(folder)}/history${limit ? `?limit=${limit}` : ''}`
     ),
+
+  generate: (prompt: string, mcp_servers?: string[]) =>
+    request<{ name: string; description: string; skill_content: string }>('/api/agents/generate', {
+      method: 'POST',
+      body: JSON.stringify({ prompt, mcp_servers }),
+    }),
 };
 
 export interface KillResponse {
@@ -153,6 +159,10 @@ export const executionsApi = {
   }),
 
   stats: (hours?: number) => request<ExecutionStats>(`/api/executions/stats${hours ? `?hours=${hours}` : ''}`),
+
+  delete: (id: string) => request<{ success: boolean; message: string }>(`/api/executions/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  }),
 };
 
 // MCP Servers API

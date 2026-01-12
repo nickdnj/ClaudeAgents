@@ -2,39 +2,87 @@
 
 A collection of AI-powered automation agents built on [Claude Code](https://claude.ai/code), featuring a web-based Orchestrator UI for visual agent management.
 
-## Highlights
+## Orchestrator UI
 
-### Orchestrator UI (In Development)
+A modern web-based control center for managing Claude Code agents. Create, edit, run, and monitor agents from your browser with a beautiful, intuitive interface.
 
-A web-based control center for managing Claude Code agents. Create, edit, run, and monitor agents from your browser.
+![Orchestrator Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) ![React](https://img.shields.io/badge/React-18-blue) ![Flask](https://img.shields.io/badge/Flask-3.0-green) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+
+### Key Features
+
+#### AI-Powered Agent Creation
+Describe what you want in natural language (with **voice input** support) and let AI generate the complete agent configuration - name, description, and full SKILL.md workflow.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  Dashboard │ Agents │ Executions │ Schedules │ MCP Servers          │
+│  ✨ Generate with AI                                        [▼]    │
 ├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────┐ │
-│   │ 12 Agents   │  │ 47 Runs/24h │  │ 3 Failed    │  │ 1 Running │ │
-│   └─────────────┘  └─────────────┘  └─────────────┘  └───────────┘ │
-│                                                                      │
-│   Recent Executions                    Quick Actions                 │
-│   ● Monthly Bulletin    2m ago   ✓     [+ Create Agent]             │
-│   ● Email Research     15m ago   ✓     [▶ Run Agent]                │
-│   ○ Proposal Review     1h ago   ✗     [Check MCP Status]           │
-│                                                                      │
+│  What should this agent do?                          [🎤 Voice]    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ Create an agent that searches my Gmail for community        │   │
+│  │ updates, extracts key highlights, and compiles them into   │   │
+│  │ a progress report...                                        │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                    [✨ Generate Agent]              │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Features:**
-- Visual agent editor with Monaco (VS Code's editor)
-- Real-time execution monitoring
-- MCP server status dashboard
-- 4-step agent creation wizard
-- Execution history and re-run capability
+#### Real-Time Task Monitoring
+Watch your agents work with live process monitoring. See PID, elapsed time, and process status. Stop runaway tasks with one click.
 
-**Tech Stack:** React + TypeScript + Flask + SQLite
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Task Details                                          [Running]   │
+├─────────────────────────────────────────────────────────────────────┤
+│  ⚡ Process is running                                              │
+│  PID: 12847 • Started 2m 34s ago                       [🛑 Stop]   │
+├─────────────────────────────────────────────────────────────────────┤
+│  Agent: Monthly Bulletin                                           │
+│  Task: Generate the January community newsletter...                │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
-[View Orchestrator Documentation →](Orchestrator/)
+#### Voice-Enabled Task Input
+Use your microphone to dictate tasks instead of typing. Built-in speech recognition works in Chrome, Edge, and Safari.
+
+#### Follow-Up Conversations
+After a task completes, ask follow-up questions. The agent receives the previous context automatically.
+
+#### Friendly Agent Editor
+Edit agents with a form-based UI or switch to Advanced mode for raw file editing with Monaco (VS Code's editor).
+
+### Screenshots
+
+| Dashboard | Agent Editor | Task Monitoring |
+|-----------|--------------|-----------------|
+| Stats, recent tasks, quick actions | Form-based editing with MCP server selection | Real-time PID tracking with stop button |
+
+### Quick Start
+
+```bash
+# Start the backend
+cd Orchestrator/backend
+python run.py
+
+# Start the frontend (separate terminal)
+cd Orchestrator/frontend
+npm install
+npm run dev
+
+# Open browser
+open http://localhost:5173
+```
+
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, TailwindCSS, Monaco Editor |
+| Backend | Flask 3.0, SQLite, subprocess management |
+| Voice | Web Speech API (browser-native) |
+| AI Generation | Claude CLI integration |
+
+[View Full Orchestrator Documentation →](Orchestrator/)
 
 ---
 
@@ -51,16 +99,6 @@ Agents that collaborate across the software development lifecycle.
 | [UX Design](UX%20Design/) | Creates wireframes and interaction designs | Ready |
 | [Email Research](Email%20Research/) | Mines Gmail for research reports | Ready |
 
-### Orchestrator Dev Team
-
-Specialized agents for building the Orchestrator UI itself.
-
-| Agent | Role | Skills |
-|-------|------|--------|
-| [Full-Stack Developer](Orchestrator/Dev%20Team/Full-Stack%20Developer/) | React + Flask implementation | TypeScript, Python, TailwindCSS |
-| [QA Engineer](Orchestrator/Dev%20Team/QA%20Engineer/) | Testing and accessibility | Jest, Playwright, WCAG |
-| [DevOps Engineer](Orchestrator/Dev%20Team/DevOps%20Engineer/) | Deployment and security | launchd, subprocess, security |
-
 ### Administrative Agents
 
 Automation for Wharfside Manor Condominium Association.
@@ -76,28 +114,34 @@ Automation for Wharfside Manor Condominium Association.
 
 ## Quick Start
 
-### Option 1: Command Line (Current)
+### Option 1: Orchestrator UI (Recommended)
 
 ```bash
-# Clone and enter
+# Clone the repo
 git clone https://github.com/nickdnj/ClaudeAgents.git
 cd ClaudeAgents
 
-# Start Claude Code
+# Start backend
+cd Orchestrator/backend
+pip install -r requirements.txt
+python run.py
+
+# Start frontend (new terminal)
+cd Orchestrator/frontend
+npm install
+npm run dev
+
+# Open http://localhost:5173
+```
+
+### Option 2: Command Line
+
+```bash
+# Start Claude Code directly
+cd ClaudeAgents
 claude
 
 # Manager agent loads automatically via CLAUDE.md
-```
-
-### Option 2: Orchestrator UI (Coming Soon)
-
-```bash
-# Start the Orchestrator
-cd orchestrator
-./start.sh
-
-# Open browser
-open http://localhost:5111
 ```
 
 ---
@@ -110,15 +154,23 @@ ClaudeAgents/
 ├── README.md                        # This file
 │
 ├── Orchestrator/                    # Web UI for agent management
-│   ├── README.md                    # Project overview
-│   ├── PRD.md                       # Product requirements
-│   ├── SAD.md                       # Software architecture
-│   ├── UXD.md                       # UX design specs
-│   ├── DESIGN.md                    # Original design notes
-│   └── Dev Team/                    # Development agents
-│       ├── Full-Stack Developer/
-│       ├── QA Engineer/
-│       └── DevOps Engineer/
+│   ├── backend/                     # Flask API server
+│   │   ├── app/
+│   │   │   ├── models/              # Database models
+│   │   │   ├── routes/              # API endpoints
+│   │   │   └── services/            # Business logic
+│   │   └── run.py                   # Entry point
+│   ├── frontend/                    # React application
+│   │   ├── src/
+│   │   │   ├── components/          # UI components
+│   │   │   ├── pages/               # Page views
+│   │   │   ├── hooks/               # Custom hooks
+│   │   │   └── api/                 # API client
+│   │   └── package.json
+│   └── docs/                        # Design documents
+│       ├── PRD.md                   # Product requirements
+│       ├── SAD.md                   # Architecture design
+│       └── UXD.md                   # UX specifications
 │
 ├── Product Requirements/            # PRD building agent
 ├── Software Architecture/           # Architecture design agent
@@ -180,7 +232,7 @@ Each agent has:
 
 ### Execution Flow
 ```
-User Request → Manager → Select Agent → Load SKILL.md → Execute with MCP → Output
+User Request → Orchestrator → Select Agent → Load SKILL.md → Execute with MCP → Output
 ```
 
 ### Document Lifecycle
@@ -192,20 +244,24 @@ Draft (v0.1) → Review (v0.2, v0.3...) → Approved → Final (v1.0)
 
 ## Roadmap
 
-### Now
+### Completed
 - [x] Product Development Suite agents
 - [x] Administrative automation agents
-- [x] Orchestrator UI design (PRD, SAD, UXD)
-- [x] Dev team agent definitions
+- [x] Orchestrator backend (Flask API)
+- [x] Orchestrator frontend (React)
+- [x] Real-time execution monitoring
+- [x] Process control (stop/kill)
+- [x] Voice input for tasks
+- [x] AI-powered agent generation
+- [x] Follow-up conversations
+- [x] Execution history database
 
-### Next
-- [ ] Orchestrator backend (Flask API)
-- [ ] Orchestrator frontend (React)
+### In Progress
 - [ ] launchd service deployment
-- [ ] Execution history database
+- [ ] Scheduled execution (cron)
+- [ ] Agent templates
 
 ### Future
-- [ ] Agent templates marketplace
 - [ ] Webhook integrations
 - [ ] Multi-user support
 - [ ] Mobile app
@@ -216,7 +272,7 @@ Draft (v0.1) → Review (v0.2, v0.3...) → Approved → Final (v1.0)
 
 1. Review the relevant agent's `SKILL.md`
 2. Check `config.json` for required MCP servers
-3. Test changes locally with Claude Code
+3. Test changes locally with the Orchestrator UI
 4. Submit PR with updated documentation
 
 ---

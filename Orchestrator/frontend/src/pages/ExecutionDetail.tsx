@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play, Trash2, Mic, MicOff } from 'lucide-react';
 import { executionsApi, agentsApi, type Execution, type ExecutionStatus } from '../api/client';
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
 export function ExecutionDetail() {
   const { executionId } = useParams<{ executionId: string }>();
@@ -14,6 +15,26 @@ export function ExecutionDetail() {
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [followUpTask, setFollowUpTask] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const {
+    isListening,
+    isSupported: isSpeechSupported,
+    startListening,
+    stopListening,
+    error: speechError,
+  } = useSpeechRecognition({
+    onResult: (transcript) => {
+      setFollowUpTask((prev) => prev ? `${prev} ${transcript}` : transcript);
+    },
+  });
+
+  // Stop listening when modal closes
+  useEffect(() => {
+    if (!showFollowUp && isListening) {
+      stopListening();
+    }
+  }, [showFollowUp, isListening, stopListening]);
 
   // Fetch execution details
   useEffect(() => {
@@ -105,6 +126,22 @@ Follow-up question: ${followUpTask}`;
     }
   };
 
+  const handleDelete = async () => {
+    if (!executionId || isDeleting) return;
+
+    if (!confirm('Are you sure you want to delete this task? This cannot be undone.')) return;
+
+    setIsDeleting(true);
+    try {
+      await executionsApi.delete(executionId);
+      navigate('/executions');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete task');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -118,7 +155,7 @@ Follow-up question: ${followUpTask}`;
       <div className="text-center py-12">
         <p className="text-red-600">{error || 'Execution not found'}</p>
         <Link to="/executions" className="text-primary hover:underline mt-4 inline-block">
-          Back to Executions
+          Back to Agent Tasks
         </Link>
       </div>
     );
@@ -135,10 +172,27 @@ Follow-up question: ${followUpTask}`;
           <ArrowLeft className="h-5 w-5 text-gray-500" />
         </Link>
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900">Execution Details</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Task Details</h2>
           <p className="text-sm text-gray-500 font-mono">{execution.id}</p>
         </div>
-        <StatusBadge status={execution.status} />
+        <div className="flex items-center gap-3">
+          <StatusBadge status={execution.status} />
+          {execution.status !== 'running' && (
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="btn bg-red-100 hover:bg-red-200 text-red-700 flex items-center gap-2 disabled:opacity-50"
+              title="Delete task"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Delete
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Process Alive Indicator for running executions */}
@@ -316,20 +370,59 @@ Follow-up question: ${followUpTask}`;
                 <p className="text-sm text-gray-500 mb-1">Previous task:</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{execution.task}</p>
               </div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Follow-up Question
-              </label>
-              <textarea
-                value={followUpTask}
-                onChange={(e) => setFollowUpTask(e.target.value)}
-                placeholder="Ask a follow-up question or request additional work..."
-                rows={4}
-                className="input resize-none"
-                autoFocus
-                disabled={isSubmitting}
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Follow-up Question
+                </label>
+                {isSpeechSupported && (
+                  <button
+                    type="button"
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={isSubmitting}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                      isListening
+                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    title={isListening ? 'Stop recording' : 'Start voice input'}
+                  >
+                    {isListening ? (
+                      <>
+                        <MicOff className="h-4 w-4" />
+                        Stop
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="h-4 w-4" />
+                        Voice
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <textarea
+                  value={followUpTask}
+                  onChange={(e) => setFollowUpTask(e.target.value)}
+                  placeholder="Ask a follow-up question or request additional work..."
+                  rows={4}
+                  className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                  autoFocus
+                  disabled={isSubmitting}
+                />
+                {isListening && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    Listening...
+                  </div>
+                )}
+              </div>
+              {speechError && (
+                <p className="mt-2 text-xs text-red-600">{speechError}</p>
+              )}
               <p className="mt-2 text-xs text-gray-500">
                 The agent will receive the previous task and output as context.
+                {isSpeechSupported && ' Click the Voice button to dictate your question.'}
               </p>
             </div>
             <div className="flex justify-end gap-3 p-6 border-t border-gray-200">

@@ -140,6 +140,40 @@ def kill_execution(execution_id: str):
         }), 500
 
 
+@executions_bp.route('/executions/<execution_id>', methods=['DELETE'])
+def delete_execution(execution_id: str):
+    """
+    Delete an execution record.
+
+    Args:
+        execution_id: Execution ID
+
+    Returns:
+        JSON with success status
+    """
+    execution = Execution.get_by_id(execution_id)
+
+    if not execution:
+        return jsonify({
+            'error': 'Execution not found',
+            'code': 'EXECUTION_NOT_FOUND'
+        }), 404
+
+    # Don't allow deleting running executions
+    if execution.status == 'running':
+        return jsonify({
+            'error': 'Cannot delete a running execution. Stop it first.',
+            'code': 'CANNOT_DELETE_RUNNING'
+        }), 400
+
+    execution.delete()
+
+    return jsonify({
+        'success': True,
+        'message': 'Execution deleted'
+    })
+
+
 @executions_bp.route('/executions/stats', methods=['GET'])
 def get_execution_stats():
     """

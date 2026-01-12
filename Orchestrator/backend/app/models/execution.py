@@ -114,6 +114,13 @@ class Execution:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
 
+    def delete(self) -> bool:
+        """Delete this execution from the database. Returns True if deleted."""
+        db = get_db()
+        db.execute('DELETE FROM executions WHERE id = ?', (self.id,))
+        db.commit()
+        return True
+
     @classmethod
     def get_by_id(cls, execution_id: str) -> Optional['Execution']:
         """Fetch execution by ID."""

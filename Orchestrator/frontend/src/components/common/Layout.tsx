@@ -6,7 +6,7 @@ import { healthApi } from '../../api/client';
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/agents', icon: Bot, label: 'Agents' },
-  { to: '/executions', icon: History, label: 'Executions' },
+  { to: '/executions', icon: History, label: 'Agent Tasks' },
   { to: '/schedules', icon: Calendar, label: 'Schedules' },
   { to: '/mcp-servers', icon: Server, label: 'MCP Servers' },
 ];

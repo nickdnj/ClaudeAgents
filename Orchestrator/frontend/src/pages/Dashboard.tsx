@@ -21,7 +21,7 @@ export function Dashboard() {
           color="blue"
         />
         <StatsCard
-          label="Executions (24h)"
+          label="Tasks (24h)"
           value={statsLoading ? '-' : stats.recent_24h}
           icon={TrendingUp}
           color="green"
@@ -42,12 +42,12 @@ export function Dashboard() {
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Executions */}
+        {/* Recent Tasks */}
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Executions</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Tasks</h3>
           <div className="space-y-3">
             {recentExecutions.length === 0 ? (
-              <p className="text-gray-500 text-sm">No executions yet</p>
+              <p className="text-gray-500 text-sm">No tasks yet</p>
             ) : (
               recentExecutions.map((exec) => (
                 <Link
@@ -76,7 +76,7 @@ export function Dashboard() {
               to="/executions"
               className="block mt-4 text-sm text-primary hover:text-primary-600"
             >
-              View All Executions →
+              View All Tasks →
             </Link>
           )}
         </div>

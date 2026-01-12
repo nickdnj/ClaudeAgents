@@ -1,6 +1,8 @@
 """
 Agent management API endpoints.
 """
+import subprocess
+import json
 from flask import Blueprint, jsonify, request, current_app
 from app.services.agent_registry import AgentRegistry
 from app.services.claude_executor import ClaudeExecutor
@@ -368,3 +370,120 @@ def get_agent_history(folder: str):
     history = git_service.get_file_history(f"{folder}/SKILL.md", limit=limit)
 
     return jsonify(history)
+
+
+# ============================================================================
+# Agent Generation Endpoint
+# ============================================================================
+
+@agents_bp.route('/agents/generate', methods=['POST'])
+def generate_agent():
+    """
+    Generate agent content using Claude.
+
+    Request body:
+        - prompt: Description of what the agent should do (required)
+        - mcp_servers: List of available MCP servers for context
+
+    Returns:
+        JSON with generated name, description, and skill_content
+    """
+    data = request.get_json()
+
+    if not data:
+        return jsonify({
+            'error': 'Request body required',
+            'code': 'MISSING_BODY'
+        }), 400
+
+    prompt = data.get('prompt', '').strip()
+
+    if not prompt:
+        return jsonify({
+            'error': 'Prompt is required',
+            'code': 'MISSING_PROMPT'
+        }), 400
+
+    mcp_servers = data.get('mcp_servers', [])
+
+    # Build the generation prompt
+    system_prompt = """You are an AI assistant that generates Claude Code agent configurations.
+
+Given a user's description of what they want an agent to do, generate:
+1. A short, descriptive name for the agent
+2. A brief description (1-2 sentences)
+3. A SKILL.md file with detailed instructions
+
+The SKILL.md should follow this structure:
+- Purpose section explaining what the agent does
+- Workflow section with numbered steps
+- Any specific instructions or constraints
+- Output format expectations
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "name": "Agent Name",
+  "description": "Brief description of what the agent does",
+  "skill_content": "# Agent Name\\n\\n## Purpose\\n...full markdown content..."
+}"""
+
+    user_prompt = f"""Create an agent with the following requirements:
+
+{prompt}
+
+Available MCP servers that can be used: {', '.join(mcp_servers) if mcp_servers else 'gmail, gdrive, google-docs, chrome'}
+
+Generate the agent configuration as JSON."""
+
+    try:
+        # Call Claude CLI to generate content
+        result = subprocess.run(
+            [current_app.config['CLAUDE_CLI_PATH'], '-p', user_prompt, '--output-format', 'text'],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            input=system_prompt
+        )
+
+        if result.returncode != 0:
+            return jsonify({
+                'error': 'Failed to generate content',
+                'code': 'GENERATION_FAILED',
+                'details': result.stderr
+            }), 500
+
+        output = result.stdout.strip()
+
+        # Try to extract JSON from the response
+        try:
+            # Look for JSON in the output
+            json_start = output.find('{')
+            json_end = output.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = output[json_start:json_end]
+                generated = json.loads(json_str)
+                return jsonify(generated)
+            else:
+                return jsonify({
+                    'error': 'Could not parse generated content',
+                    'code': 'PARSE_ERROR',
+                    'raw_output': output
+                }), 500
+        except json.JSONDecodeError as e:
+            return jsonify({
+                'error': 'Invalid JSON in generated content',
+                'code': 'JSON_ERROR',
+                'raw_output': output,
+                'details': str(e)
+            }), 500
+
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            'error': 'Generation timed out',
+            'code': 'TIMEOUT'
+        }), 504
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'code': 'GENERATION_ERROR'
+        }), 500

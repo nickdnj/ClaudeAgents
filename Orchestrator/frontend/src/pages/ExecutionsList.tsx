@@ -26,7 +26,7 @@ export function ExecutionsList() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <h2 className="text-2xl font-bold text-gray-900">Executions</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Agent Tasks</h2>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4">
@@ -94,7 +94,7 @@ export function ExecutionsList() {
             ) : executions.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                  No executions found
+                  No tasks found
                 </td>
               </tr>
             ) : (

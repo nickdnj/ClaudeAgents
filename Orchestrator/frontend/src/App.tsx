@@ -3,6 +3,7 @@ import { Layout } from './components/common/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { AgentsList } from './pages/AgentsList';
 import { AgentDetail } from './pages/AgentDetail';
+import { CreateAgent } from './pages/CreateAgent';
 import { ExecutionsList } from './pages/ExecutionsList';
 import { ExecutionDetail } from './pages/ExecutionDetail';
 import { Schedules } from './pages/Schedules';
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="agents" element={<AgentsList />} />
+          <Route path="agents/new" element={<CreateAgent />} />
           <Route path="agents/:folder" element={<AgentDetail />} />
           <Route path="executions" element={<ExecutionsList />} />
           <Route path="executions/:executionId" element={<ExecutionDetail />} />
