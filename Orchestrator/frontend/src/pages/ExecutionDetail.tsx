@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle } from 'lucide-react';
-import { executionsApi, type Execution, type ExecutionStatus } from '../api/client';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play } from 'lucide-react';
+import { executionsApi, agentsApi, type Execution, type ExecutionStatus } from '../api/client';
 
 export function ExecutionDetail() {
   const { executionId } = useParams<{ executionId: string }>();
+  const navigate = useNavigate();
   const [execution, setExecution] = useState<Execution | null>(null);
   const [status, setStatus] = useState<ExecutionStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isKilling, setIsKilling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [followUpTask, setFollowUpTask] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch execution details
   useEffect(() => {
@@ -71,6 +75,33 @@ export function ExecutionDetail() {
       alert(err instanceof Error ? err.message : 'Failed to stop execution');
     } finally {
       setIsKilling(false);
+    }
+  };
+
+  const handleFollowUp = async () => {
+    if (!execution || !followUpTask.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      // Build a follow-up task that includes context from the previous execution
+      const contextualTask = `Follow-up to previous task.
+
+Previous task: ${execution.task}
+
+Previous output:
+${execution.output}
+
+Follow-up question: ${followUpTask}`;
+
+      const result = await agentsApi.execute(execution.agent_folder, contextualTask);
+      setShowFollowUp(false);
+      setFollowUpTask('');
+      // Navigate to the new execution
+      navigate(`/executions/${result.id}`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to submit follow-up');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -224,6 +255,30 @@ export function ExecutionDetail() {
         </div>
       )}
 
+      {/* Follow Up Action for successful executions */}
+      {execution.status === 'success' && execution.output && (
+        <div className="card p-4 bg-green-50 border-green-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="font-medium text-green-800">Task completed successfully</p>
+                <p className="text-sm text-green-600">
+                  You can ask a follow-up question based on this result
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowFollowUp(true)}
+              className="btn btn-primary flex items-center gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Follow Up
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Error */}
       {execution.error && (
         <div className="card border-red-200">
@@ -234,6 +289,70 @@ export function ExecutionDetail() {
             <pre className="text-red-700 whitespace-pre-wrap text-sm">
               {execution.error}
             </pre>
+          </div>
+        </div>
+      )}
+
+      {/* Follow Up Modal */}
+      {showFollowUp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isSubmitting && setShowFollowUp(false)}
+          />
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">Follow Up</h3>
+              <button
+                onClick={() => setShowFollowUp(false)}
+                disabled={isSubmitting}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500 mb-1">Previous task:</p>
+                <p className="text-sm text-gray-700 line-clamp-2">{execution.task}</p>
+              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Follow-up Question
+              </label>
+              <textarea
+                value={followUpTask}
+                onChange={(e) => setFollowUpTask(e.target.value)}
+                placeholder="Ask a follow-up question or request additional work..."
+                rows={4}
+                className="input resize-none"
+                autoFocus
+                disabled={isSubmitting}
+              />
+              <p className="mt-2 text-xs text-gray-500">
+                The agent will receive the previous task and output as context.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowFollowUp(false)}
+                disabled={isSubmitting}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFollowUp}
+                disabled={!followUpTask.trim() || isSubmitting}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                Submit
+              </button>
+            </div>
           </div>
         </div>
       )}
