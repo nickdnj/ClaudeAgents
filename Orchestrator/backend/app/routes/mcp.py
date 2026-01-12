@@ -16,8 +16,9 @@ def get_mcp_servers() -> list[dict]:
     Returns:
         List of MCP server configurations
     """
-    # Claude Code settings location
+    # Claude Code settings locations (in priority order)
     settings_paths = [
+        Path.home() / '.claude.json',  # Main Claude Code config
         Path.home() / '.claude' / 'settings.json',
         Path.home() / '.config' / 'claude' / 'settings.json',
     ]
@@ -43,7 +44,8 @@ def get_mcp_servers() -> list[dict]:
                     'status': 'configured',  # We can't easily check running status
                 })
 
-            break  # Use first found settings file
+            if servers:  # Found servers, stop looking
+                break
 
         except (json.JSONDecodeError, IOError):
             continue

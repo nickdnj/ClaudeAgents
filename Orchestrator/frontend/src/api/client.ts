@@ -4,13 +4,19 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5111';
 
+export interface Schedule {
+  cron: string;
+  description?: string;
+  timezone?: string;
+}
+
 export interface Agent {
   folder: string;
   name: string;
   description: string;
-  trigger: string;
+  trigger: string | { type: string; description?: string };
   mcp_servers: string[];
-  schedule: string | null;
+  schedule: Schedule | string | null;
   skill_content?: string;
   config_content?: string;
 }

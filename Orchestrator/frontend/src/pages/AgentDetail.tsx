@@ -140,7 +140,11 @@ export function AgentDetail() {
         {agent.schedule && (
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-400" />
-            <span className="text-gray-600">{agent.schedule}</span>
+            <span className="text-gray-600">
+              {typeof agent.schedule === 'object'
+                ? agent.schedule.description || agent.schedule.cron
+                : agent.schedule}
+            </span>
           </div>
         )}
       </div>

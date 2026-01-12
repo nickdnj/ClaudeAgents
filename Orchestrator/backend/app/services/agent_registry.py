@@ -224,5 +224,5 @@ class AgentRegistry:
         return agent
 
     def _is_valid_folder_name(self, name: str) -> bool:
-        """Validate folder name (alphanumeric + hyphens only)."""
-        return bool(re.match(r'^[a-zA-Z0-9-]+$', name))
+        """Validate folder name (alphanumeric, hyphens, spaces allowed)."""
+        return bool(re.match(r'^[a-zA-Z0-9- ]+$', name))
