@@ -31,10 +31,19 @@ Understand various ways users express research requests:
 
 ## Email Mining Strategy
 
-### Gmail Account
-- Account: `nickd@wharfsidemb.com`
+### Gmail Accounts
+
+Two accounts are available for searching:
+
+| Account | Address | Use Case |
+|---------|---------|----------|
+| **board** (default) | `nickd@wharfsidemb.com` | Current board email |
+| **personal** | `nickd@demarconet.com` | Historical board business & prior board tenure |
+
 - Default lookback: 90 days (configurable)
-- All emails in this account are Wharfside Board-related
+- By default, searches use the board account
+- User can specify "search my personal email" or "search both accounts"
+- For comprehensive historical research, search both accounts
 
 ### Search Approach
 
@@ -50,6 +59,32 @@ Understand various ways users express research requests:
 3. **Sender Context**
    - Note who is involved in discussions
    - Identify key stakeholders
+
+4. **Handling Search Result Limits (CRITICAL)**
+   - Gmail MCP searches are limited to ~100 results per query
+   - **When a search returns the maximum number of results, you MUST dig deeper**
+   - Break the time period into smaller ranges and search again
+   - Continue until all searches return fewer than the maximum results
+
+   **Example:** If searching "marina" returns 100 results for 2024:
+   ```
+   Initial search: marina after:2024/01/01 before:2025/01/01 → 100 results (MAX HIT)
+
+   Break into quarters:
+   - marina after:2024/01/01 before:2024/04/01 → 45 results ✓
+   - marina after:2024/04/01 before:2024/07/01 → 100 results (MAX HIT - dig deeper)
+   - marina after:2024/07/01 before:2024/10/01 → 30 results ✓
+   - marina after:2024/10/01 before:2025/01/01 → 55 results ✓
+
+   For Q2 that hit max, break into months:
+   - marina after:2024/04/01 before:2024/05/01 → 60 results ✓
+   - marina after:2024/05/01 before:2024/06/01 → 40 results ✓
+   - marina after:2024/06/01 before:2024/07/01 → 25 results ✓
+   ```
+
+   - This ensures no emails are missed due to result limits
+   - Track which time periods hit the limit and report this to the user
+   - The goal is **complete coverage** - missing emails means missing important history
 
 ### Information Extraction
 
@@ -126,6 +161,63 @@ Send research report as a professionally formatted HTML email:
 - **Subject:** `Email Research: [Topic] - Draft v{version}`
 - **Format:** text/html for rich formatting
 
+### Secondary Output: Markdown Report File
+In addition to the HTML email, save a markdown file as a persistent record:
+- **Location:** `Email Research/reports/` folder
+- **Filename:** `{topic-slug}_{date}.md` (e.g., `marina-history_2026-01-12.md`)
+- **Purpose:** Persistent reference that can be tracked in git
+
+#### Markdown Report Structure
+```markdown
+# Email Research: {Topic}
+
+**Generated:** {Date}
+**Timeframe:** {Start Date} - {End Date}
+**Emails Analyzed:** {Count}
+**Version:** {Version}
+
+---
+
+## Executive Summary
+{2-3 paragraph overview}
+
+## Timeline of Communications
+| Date | Subject | From | Key Point |
+|------|---------|------|-----------|
+| ... | ... | ... | ... |
+
+## Key Themes & Findings
+
+### Decisions Made
+- {Decision with date and context}
+
+### Action Items
+- [ ] {Open task} - {Owner} - {Deadline if known}
+
+### Financial Information
+- {Costs, budgets, quotes}
+
+### Technical Details
+- {Specifications, requirements, vendor info}
+
+### Stakeholders
+**Internal:** {Board members, management}
+**External:** {Vendors, contractors}
+
+## Outstanding Questions
+- {Unresolved issue}
+
+## Source References
+| Thread Subject | Date | Participants | Account |
+|---------------|------|--------------|---------|
+| ... | ... | ... | board/personal |
+```
+
+#### When to Create Markdown Reports
+- **Always** create a markdown file for substantial research (>5 emails)
+- **Update** existing markdown file on subsequent versions
+- **Keep** previous versions in git history for reference
+
 ### Version Tracking
 - **Draft versions:** v0.1, v0.2, v0.3, etc.
 - Each revision increments the version number
@@ -193,6 +285,34 @@ Key findings:
 - Total budget: $47,500
 
 Reply to the email with any feedback or changes you'd like.
+```
+
+### Searching Multiple Accounts
+```
+User: Search both my accounts for anything about the roof replacement from 2019
+
+Agent: I'll search both your board and personal email accounts for roof
+replacement discussions from 2019.
+
+[Searches nickd@wharfsidemb.com]
+[Searches nickd@demarconet.com]
+
+I found 8 emails in your board account and 12 emails in your personal
+account about the 2019 roof replacement project.
+
+Sending research report v0.1 to your email now...
+
+[Sends HTML email report with sources labeled by account]
+```
+
+### Personal Account Only
+```
+User: Check my personal email for old board minutes from when I was on the board
+
+Agent: I'll search your personal email (nickd@demarconet.com) for historical
+board minutes.
+
+[Searches personal account only]
 ```
 
 ### Email-Based Iteration
@@ -287,11 +407,13 @@ If search returns no relevant emails:
 - Suggest alternative keywords
 - Offer to expand timeframe
 
-### Too Many Results
-If search returns overwhelming results:
-- Ask user to narrow focus
-- Suggest specific aspects to prioritize
-- Offer to break into multiple reports
+### Too Many Results / Search Limit Hit
+If search returns the maximum number of results (~100):
+- **DO NOT ask user to narrow focus** - automatically dig deeper
+- Break the time period into smaller ranges (see "Handling Search Result Limits" above)
+- Continue subdividing until all searches return fewer than max results
+- Only after ensuring complete coverage, inform the user of the total found
+- If a topic genuinely has thousands of emails, offer to break into multiple reports by sub-topic
 
 ### Ambiguous Topics
 If topic is unclear:

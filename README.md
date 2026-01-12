@@ -1,12 +1,27 @@
 # Claude Agents
 
-A collection of AI-powered automation agents for Wharfside Manor Condominium Association, built on [Claude Code](https://claude.ai/code).
+A collection of AI-powered automation agents built on [Claude Code](https://claude.ai/code), including both administrative automation for Wharfside Manor Condominium Association and a Product Development Agent Suite for software projects.
 
 ## Overview
 
-This repository contains Claude Code agent configurations (skills) that automate routine administrative tasks. Each agent is defined by a `SKILL.md` file (behavior instructions) and a `config.json` file (settings and MCP server dependencies).
+This repository contains Claude Code agent configurations (skills) that automate various tasks. Each agent is defined by a `SKILL.md` file (behavior instructions) and a `config.json` file (settings and MCP server dependencies).
 
-## Agents
+## Agent Categories
+
+### Product Development Suite
+
+A comprehensive suite of agents that work together through the software development lifecycle. See [PRODUCT_DEVELOPMENT_SUITE.md](PRODUCT_DEVELOPMENT_SUITE.md) for the full vision.
+
+| Agent | Description | Trigger |
+|-------|-------------|---------|
+| **Product Requirements** | Builds PRDs through interactive conversation | On-demand |
+| **Software Architecture** | Designs technical architectures with diagrams and ADRs | On-demand |
+| **UX Design** | Creates UX specs, wireframes, and interaction designs | On-demand |
+| **Email Research** | Mines Gmail for information and produces research reports | On-demand |
+
+### Administrative Agents
+
+Automation for Wharfside Manor Condominium Association operations.
 
 | Agent | Description | Trigger |
 |-------|-------------|---------|
@@ -39,22 +54,42 @@ This repository contains Claude Code agent configurations (skills) that automate
 
 ```
 ClaudeAgents/
-├── CLAUDE.md              # Global instructions for Claude Code
+├── CLAUDE.md                    # Global instructions for Claude Code
+├── PRODUCT_DEVELOPMENT_SUITE.md # Vision doc for development agents
+├── Orchestrator/                # Future: Automated agent execution system
+│   └── DESIGN.md                # Orchestrator architecture design
+│
+├── # Product Development Agents
+├── Product Requirements/
+│   ├── SKILL.md                 # PRD building workflow
+│   └── config.json              # Google Docs integration
+├── Software Architecture/
+│   ├── SKILL.md                 # Architecture design workflow
+│   └── config.json              # GitHub + Google Docs output
+├── UX Design/
+│   ├── SKILL.md                 # UX specification workflow
+│   └── config.json              # Wireframe and component specs
+├── Email Research/
+│   ├── SKILL.md                 # Gmail mining workflow
+│   ├── config.json              # Search and report settings
+│   └── reports/                 # Generated research reports
+│
+├── # Administrative Agents
 ├── Manager/
-│   ├── SKILL.md           # Agent orchestration logic
-│   └── config.json        # GitHub sync and discovery settings
+│   ├── SKILL.md                 # Agent orchestration logic
+│   └── config.json              # GitHub sync and discovery settings
 ├── Monthly Bulletin/
-│   ├── SKILL.md           # Bulletin generation workflow
-│   ├── config.json        # Gmail, styling, versioning config
-│   └── examples/          # Past bulletins for reference
+│   ├── SKILL.md                 # Bulletin generation workflow
+│   ├── config.json              # Gmail, styling, versioning config
+│   └── examples/                # Past bulletins for reference
 ├── Presentation/
-│   ├── SKILL.md           # PowerPoint creation workflow
-│   ├── config.json        # Template and output settings
-│   └── templates/         # Branded PPTX templates
+│   ├── SKILL.md                 # PowerPoint creation workflow
+│   ├── config.json              # Template and output settings
+│   └── templates/               # Branded PPTX templates
 ├── proposal-review/
-│   ├── SKILL.md           # Proposal analysis framework
-│   └── config.json        # Review criteria and output format
-└── Wharfside_Logo.png     # Branding asset
+│   ├── SKILL.md                 # Proposal analysis framework
+│   └── config.json              # Review criteria and output format
+└── Wharfside_Logo.png           # Branding asset
 ```
 
 ## MCP Server Setup

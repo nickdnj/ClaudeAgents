@@ -1,0 +1,68 @@
+{
+  "name": "product-requirements",
+  "description": "Builds comprehensive Product Requirements Documents through interactive conversation",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "google-docs",
+    "gdrive"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user wants to create or continue a PRD"
+  },
+
+  "gdrive": {
+    "output_folder_name": "Product Requirements"
+  },
+
+  "output": {
+    "primary_format": "google-doc",
+    "secondary_format": "markdown",
+    "markdown_output_dir": "output",
+    "filename_format": "{project-name}_PRD_{date}.md"
+  },
+
+  "templates": {
+    "prd_sections": [
+      "overview",
+      "scope",
+      "functional_requirements",
+      "non_functional_requirements",
+      "technical_requirements",
+      "user_experience",
+      "dependencies_assumptions",
+      "open_questions",
+      "revision_history"
+    ]
+  },
+
+  "versioning": {
+    "draft_prefix": "0.",
+    "review_version": "0.9",
+    "approved_version": "1.0",
+    "statuses": {
+      "draft": "Draft",
+      "review": "Under Review",
+      "approved": "Approved"
+    }
+  },
+
+  "integrations": {
+    "email_research": {
+      "enabled": true,
+      "description": "Can import findings from Email Research agent"
+    },
+    "presentation": {
+      "enabled": true,
+      "description": "Can handoff to Presentation agent for stakeholder decks"
+    }
+  },
+
+  "session": {
+    "auto_save": true,
+    "save_interval_minutes": 10,
+    "resume_enabled": true
+  }
+}

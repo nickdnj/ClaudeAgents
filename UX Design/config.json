@@ -1,0 +1,110 @@
+{
+  "name": "ux-design",
+  "description": "Creates user experience specifications, wireframe descriptions, and interaction designs",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "google-docs-mcp",
+    "google-drive"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user wants to create UX specifications for a project"
+  },
+
+  "github": {
+    "output_path": "docs/ux",
+    "file_structure": {
+      "main_doc": "ux-spec.md",
+      "user_flows": "user-flows.md",
+      "wireframes_folder": "wireframes",
+      "components": "components.md",
+      "design_tokens": "design-tokens.md"
+    }
+  },
+
+  "gdrive": {
+    "output_folder_name": "UX Design Documents"
+  },
+
+  "output": {
+    "primary_format": "markdown",
+    "secondary_format": "google-doc",
+    "filename_format": "{project-name}_UX_Spec_{date}.md"
+  },
+
+  "templates": {
+    "ux_sections": [
+      "executive_summary",
+      "user_personas",
+      "information_architecture",
+      "user_flows",
+      "wireframe_specifications",
+      "component_library",
+      "interaction_design",
+      "responsive_design",
+      "accessibility_specifications",
+      "content_guidelines",
+      "design_tokens",
+      "open_questions",
+      "revision_history"
+    ]
+  },
+
+  "wireframe_format": {
+    "type": "ascii",
+    "description": "Text-based wireframe descriptions using ASCII art layouts",
+    "includes": [
+      "layout_diagram",
+      "component_breakdown",
+      "data_displayed",
+      "actions_available",
+      "states"
+    ]
+  },
+
+  "accessibility": {
+    "default_target": "WCAG 2.1 AA",
+    "checklist_includes": [
+      "color_contrast",
+      "keyboard_navigation",
+      "screen_reader_support",
+      "focus_management"
+    ]
+  },
+
+  "versioning": {
+    "draft_prefix": "0.",
+    "review_version": "0.9",
+    "approved_version": "1.0",
+    "statuses": {
+      "draft": "Draft",
+      "review": "Under Review",
+      "approved": "Approved"
+    }
+  },
+
+  "integrations": {
+    "product_requirements": {
+      "enabled": true,
+      "description": "Receives PRD as input for UX design",
+      "input_type": "google-doc-or-markdown"
+    },
+    "software_architecture": {
+      "enabled": true,
+      "description": "Receives API contracts and data models for design constraints",
+      "input_type": "markdown"
+    },
+    "dev_planning": {
+      "enabled": true,
+      "description": "Provides component specs for implementation planning"
+    }
+  },
+
+  "session": {
+    "auto_save": true,
+    "save_interval_minutes": 10,
+    "resume_enabled": true
+  }
+}

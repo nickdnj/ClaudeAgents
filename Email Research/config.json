@@ -13,7 +13,17 @@
   },
 
   "gmail": {
-    "account": "nickd@wharfsidemb.com",
+    "accounts": {
+      "board": {
+        "address": "nickd@wharfsidemb.com",
+        "description": "Current board email account"
+      },
+      "personal": {
+        "address": "nickd@demarconet.com",
+        "description": "Personal email with historical board business"
+      }
+    },
+    "default_account": "board",
     "default_lookback_days": 90
   },
 
@@ -22,7 +32,12 @@
     "to": "nickd@wharfsidemb.com",
     "subject_format": "Email Research: {topic} - Draft v{version}",
     "final_subject_format": "Email Research: {topic} - v1.0 FINAL",
-    "mime_type": "text/html"
+    "mime_type": "text/html",
+    "markdown_reports": {
+      "enabled": true,
+      "directory": "reports",
+      "filename_format": "{topic-slug}_{date}.md"
+    }
   },
 
   "versioning": {

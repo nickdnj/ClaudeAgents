@@ -1,0 +1,103 @@
+{
+  "name": "software-architecture",
+  "description": "Designs technical architectures for software systems based on product requirements",
+  "version": "1.0",
+
+  "mcp_servers": [
+    "google-docs-mcp",
+    "google-drive"
+  ],
+
+  "trigger": {
+    "type": "on-demand",
+    "description": "Triggered when user wants to design system architecture from a PRD"
+  },
+
+  "github": {
+    "output_path": "docs/architecture",
+    "file_structure": {
+      "main_doc": "system-design.md",
+      "data_model": "data-model.md",
+      "api_spec": "api-spec.md",
+      "decisions_folder": "decisions"
+    }
+  },
+
+  "gdrive": {
+    "output_folder_name": "Architecture Documents"
+  },
+
+  "output": {
+    "primary_format": "markdown",
+    "secondary_format": "google-doc",
+    "filename_format": "{project-name}_Architecture_{date}.md"
+  },
+
+  "templates": {
+    "architecture_sections": [
+      "executive_summary",
+      "system_context",
+      "component_architecture",
+      "data_architecture",
+      "api_design",
+      "infrastructure_architecture",
+      "security_architecture",
+      "cross_cutting_concerns",
+      "development_guidelines",
+      "adrs",
+      "open_questions",
+      "revision_history"
+    ]
+  },
+
+  "diagram_types": {
+    "required": [
+      "system_context",
+      "component_diagram",
+      "data_model_erd",
+      "deployment_diagram"
+    ],
+    "optional": [
+      "sequence_diagrams",
+      "state_diagrams"
+    ],
+    "format": "mermaid"
+  },
+
+  "versioning": {
+    "draft_prefix": "0.",
+    "review_version": "0.9",
+    "approved_version": "1.0",
+    "statuses": {
+      "draft": "Draft",
+      "review": "Under Review",
+      "approved": "Approved"
+    }
+  },
+
+  "integrations": {
+    "product_requirements": {
+      "enabled": true,
+      "description": "Receives PRD as input for architecture design",
+      "input_type": "google-doc-or-markdown"
+    },
+    "ux_design": {
+      "enabled": true,
+      "description": "Provides API contracts and data models to UX Design agent"
+    },
+    "dev_planning": {
+      "enabled": true,
+      "description": "Provides component breakdown for task estimation"
+    },
+    "security": {
+      "enabled": true,
+      "description": "Provides architecture for security review"
+    }
+  },
+
+  "session": {
+    "auto_save": true,
+    "save_interval_minutes": 10,
+    "resume_enabled": true
+  }
+}
