@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle } from 'lucide-react';
 import { executionsApi, type Execution, type ExecutionStatus } from '../api/client';
 
 export function ExecutionDetail() {
@@ -8,6 +8,7 @@ export function ExecutionDetail() {
   const [execution, setExecution] = useState<Execution | null>(null);
   const [status, setStatus] = useState<ExecutionStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isKilling, setIsKilling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch execution details
@@ -56,6 +57,23 @@ export function ExecutionDetail() {
     return () => clearInterval(interval);
   }, [executionId, execution?.status]);
 
+  const handleKill = async () => {
+    if (!executionId || isKilling) return;
+
+    if (!confirm('Are you sure you want to stop this execution?')) return;
+
+    setIsKilling(true);
+    try {
+      const result = await executionsApi.kill(executionId);
+      setExecution(result.execution);
+      setStatus(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to stop execution');
+    } finally {
+      setIsKilling(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -95,35 +113,49 @@ export function ExecutionDetail() {
       {/* Process Alive Indicator for running executions */}
       {execution.status === 'running' && (
         <div className="card p-4 bg-blue-50 border-blue-200">
-          <div className="flex items-center gap-3">
-            {status?.process_alive ? (
-              <>
-                <Activity className="h-5 w-5 text-green-600 animate-pulse" />
-                <div>
-                  <p className="font-medium text-green-800">Process is running</p>
-                  <p className="text-sm text-green-600">
-                    PID: {status.pid} • Started {formatDuration(execution.started_at)} ago
-                  </p>
-                </div>
-              </>
-            ) : status ? (
-              <>
-                <Clock className="h-5 w-5 text-yellow-600" />
-                <div>
-                  <p className="font-medium text-yellow-800">Waiting for process</p>
-                  <p className="text-sm text-yellow-600">
-                    Process not yet detected or initializing...
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-                <div>
-                  <p className="font-medium text-blue-800">Checking process status...</p>
-                </div>
-              </>
-            )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {status?.process_alive ? (
+                <>
+                  <Activity className="h-5 w-5 text-green-600 animate-pulse" />
+                  <div>
+                    <p className="font-medium text-green-800">Process is running</p>
+                    <p className="text-sm text-green-600">
+                      PID: {status.pid} • Started {formatDuration(execution.started_at)} ago
+                    </p>
+                  </div>
+                </>
+              ) : status ? (
+                <>
+                  <Clock className="h-5 w-5 text-yellow-600" />
+                  <div>
+                    <p className="font-medium text-yellow-800">Waiting for process</p>
+                    <p className="text-sm text-yellow-600">
+                      Process not yet detected or initializing...
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                  <div>
+                    <p className="font-medium text-blue-800">Checking process status...</p>
+                  </div>
+                </>
+              )}
+            </div>
+            <button
+              onClick={handleKill}
+              disabled={isKilling}
+              className="btn bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 disabled:opacity-50"
+            >
+              {isKilling ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <StopCircle className="h-4 w-4" />
+              )}
+              Stop
+            </button>
           </div>
         </div>
       )}

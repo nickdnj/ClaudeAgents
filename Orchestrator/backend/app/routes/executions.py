@@ -94,6 +94,52 @@ def get_execution_status(execution_id: str):
     })
 
 
+@executions_bp.route('/executions/<execution_id>/kill', methods=['POST'])
+def kill_execution(execution_id: str):
+    """
+    Kill a running execution process.
+
+    Args:
+        execution_id: Execution ID
+
+    Returns:
+        JSON with success status and updated execution
+    """
+    execution = Execution.get_by_id(execution_id)
+
+    if not execution:
+        return jsonify({
+            'error': 'Execution not found',
+            'code': 'EXECUTION_NOT_FOUND'
+        }), 404
+
+    if execution.status != 'running':
+        return jsonify({
+            'error': 'Execution is not running',
+            'code': 'NOT_RUNNING'
+        }), 400
+
+    if not execution.pid:
+        return jsonify({
+            'error': 'No process ID available',
+            'code': 'NO_PID'
+        }), 400
+
+    killed = execution.kill_process()
+
+    if killed:
+        return jsonify({
+            'success': True,
+            'message': 'Process killed',
+            'execution': execution.to_dict()
+        })
+    else:
+        return jsonify({
+            'error': 'Failed to kill process',
+            'code': 'KILL_FAILED'
+        }), 500
+
+
 @executions_bp.route('/executions/stats', methods=['GET'])
 def get_execution_stats():
     """

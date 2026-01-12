@@ -126,6 +126,12 @@ export const agentsApi = {
     ),
 };
 
+export interface KillResponse {
+  success: boolean;
+  message: string;
+  execution: Execution;
+}
+
 // Executions API
 export const executionsApi = {
   list: (params?: { agent?: string; status?: string; limit?: number; offset?: number }) => {
@@ -141,6 +147,10 @@ export const executionsApi = {
   get: (id: string) => request<Execution>(`/api/executions/${encodeURIComponent(id)}`),
 
   status: (id: string) => request<ExecutionStatus>(`/api/executions/${encodeURIComponent(id)}/status`),
+
+  kill: (id: string) => request<KillResponse>(`/api/executions/${encodeURIComponent(id)}/kill`, {
+    method: 'POST',
+  }),
 
   stats: (hours?: number) => request<ExecutionStats>(`/api/executions/stats${hours ? `?hours=${hours}` : ''}`),
 };

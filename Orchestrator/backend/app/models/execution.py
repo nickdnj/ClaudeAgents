@@ -92,6 +92,24 @@ class Execution:
         except (OSError, ProcessLookupError):
             return False
 
+    def kill_process(self) -> bool:
+        """Kill the execution process if running. Returns True if killed."""
+        if not self.pid or self.status != 'running':
+            return False
+        try:
+            os.kill(self.pid, 9)  # SIGKILL
+            self.status = 'failed'
+            self.error = 'Process killed by user'
+            self.completed_at = datetime.utcnow().isoformat()
+            if self.started_at:
+                start = datetime.fromisoformat(self.started_at)
+                end = datetime.fromisoformat(self.completed_at)
+                self.duration_seconds = (end - start).total_seconds()
+            self.save()
+            return True
+        except (OSError, ProcessLookupError):
+            return False
+
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
