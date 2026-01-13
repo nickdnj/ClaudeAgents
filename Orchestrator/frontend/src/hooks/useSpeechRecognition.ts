@@ -71,7 +71,7 @@ declare global {
 export function useSpeechRecognition(
   options: UseSpeechRecognitionOptions = {}
 ): UseSpeechRecognitionReturn {
-  const { continuous = false, interimResults = true } = options;
+  const { continuous = true, interimResults = true } = options;
 
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -80,6 +80,7 @@ export function useSpeechRecognition(
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const onResultRef = useRef(options.onResult);
   const onErrorRef = useRef(options.onError);
+  const shouldRestartRef = useRef(false);
 
   // Keep refs updated
   useEffect(() => {
@@ -149,10 +150,23 @@ export function useSpeechRecognition(
     };
 
     recognition.onend = () => {
-      console.log('Speech recognition ended');
-      setIsListening(false);
+      console.log('Speech recognition ended, shouldRestart:', shouldRestartRef.current);
+      // If we should still be listening (user didn't stop), restart
+      if (shouldRestartRef.current && continuous) {
+        console.log('Restarting speech recognition...');
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error('Failed to restart speech recognition:', err);
+          setIsListening(false);
+          shouldRestartRef.current = false;
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
+    shouldRestartRef.current = true;
     setError(null);
     setTranscript('');
 
@@ -165,6 +179,7 @@ export function useSpeechRecognition(
   }, [isSupported, continuous, interimResults]);
 
   const stopListening = useCallback(() => {
+    shouldRestartRef.current = false;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
@@ -174,6 +189,7 @@ export function useSpeechRecognition(
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      shouldRestartRef.current = false;
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
