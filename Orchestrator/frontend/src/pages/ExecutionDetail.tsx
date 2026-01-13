@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play, Trash2, Mic, MicOff, Link as LinkIcon, FileText, Image } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Activity, Loader2, StopCircle, MessageSquare, X, Play, Trash2, Link as LinkIcon, FileText, Image } from 'lucide-react';
 import { executionsApi, agentsApi, type Execution, type ExecutionStatus } from '../api/client';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 
 export function ExecutionDetail() {
   const { executionId } = useParams<{ executionId: string }>();
@@ -485,55 +486,30 @@ Follow-up question: ${followUpTask}`;
                 <label className="block text-sm font-medium text-gray-700">
                   Follow-up Question
                 </label>
-                {isSpeechSupported && (
-                  <button
-                    type="button"
-                    onClick={isListening ? stopListening : startListening}
-                    disabled={isSubmitting}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                      isListening
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                    title={isListening ? 'Stop recording' : 'Start voice input'}
-                  >
-                    {isListening ? (
-                      <>
-                        <MicOff className="h-4 w-4" />
-                        Stop
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="h-4 w-4" />
-                        Voice
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-              <div className="relative">
-                <textarea
-                  value={followUpTask}
-                  onChange={(e) => setFollowUpTask(e.target.value)}
-                  placeholder="Ask a follow-up question or request additional work..."
-                  rows={4}
-                  className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
-                  autoFocus
+                <VoiceInputButton
+                  isListening={isListening}
+                  isSupported={isSpeechSupported}
+                  onStart={startListening}
+                  onStop={stopListening}
                   disabled={isSubmitting}
+                  size="sm"
                 />
-                {isListening && (
-                  <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
-                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                    Listening...
-                  </div>
-                )}
               </div>
+              <textarea
+                value={followUpTask}
+                onChange={(e) => setFollowUpTask(e.target.value)}
+                placeholder="Ask a follow-up question or request additional work..."
+                rows={4}
+                className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                autoFocus
+                disabled={isSubmitting}
+              />
               {speechError && (
                 <p className="mt-2 text-xs text-red-600">{speechError}</p>
               )}
               <p className="mt-2 text-xs text-gray-500">
                 The agent will receive the previous task and output as context.
-                {isSpeechSupported && ' Click the Voice button to dictate your question.'}
+                {isSpeechSupported && ' Click the microphone to dictate your question.'}
               </p>
             </div>
             <div className="flex justify-end gap-3 p-6 border-t border-gray-200">

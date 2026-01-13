@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Loader2, CheckCircle, XCircle, ExternalLink, Mic, MicOff, Plus, Trash2, Link, FileText, Image, ChevronDown, ChevronUp, Upload } from 'lucide-react';
+import { X, Play, Loader2, CheckCircle, XCircle, ExternalLink, Plus, Trash2, Link, FileText, Image, ChevronDown, ChevronUp, Upload } from 'lucide-react';
 import type { Agent, Execution } from '../../api/client';
 import { agentsApi } from '../../api/client';
 import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
+import { VoiceInputButton } from '../common/VoiceInputButton';
 
 interface RunAgentModalProps {
   agent: Agent;
@@ -218,53 +219,28 @@ export function RunAgentModal({ agent, isOpen, onClose }: RunAgentModalProps) {
                   <label className="block text-sm font-medium text-gray-700">
                     Task Description
                   </label>
-                  {isSpeechSupported && (
-                    <button
-                      type="button"
-                      onClick={isListening ? stopListening : startListening}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        isListening
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      title={isListening ? 'Stop recording' : 'Start voice input'}
-                    >
-                      {isListening ? (
-                        <>
-                          <MicOff className="h-4 w-4" />
-                          Stop
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="h-4 w-4" />
-                          Voice
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="relative">
-                  <textarea
-                    value={task}
-                    onChange={(e) => setTask(e.target.value)}
-                    placeholder="Describe what you want the agent to do..."
-                    rows={5}
-                    className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
-                    autoFocus
+                  <VoiceInputButton
+                    isListening={isListening}
+                    isSupported={isSpeechSupported}
+                    onStart={startListening}
+                    onStop={stopListening}
+                    size="sm"
                   />
-                  {isListening && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
-                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      Listening...
-                    </div>
-                  )}
                 </div>
+                <textarea
+                  value={task}
+                  onChange={(e) => setTask(e.target.value)}
+                  placeholder="Describe what you want the agent to do..."
+                  rows={5}
+                  className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                  autoFocus
+                />
                 {speechError && (
                   <p className="mt-2 text-xs text-red-600">{speechError}</p>
                 )}
                 <p className="mt-2 text-xs text-gray-500">
                   Enter a natural language description of the task you want this agent to perform.
-                  {isSpeechSupported && ' Click the Voice button to dictate your task.'}
+                  {isSpeechSupported && ' Click the microphone to dictate your task.'}
                 </p>
               </div>
 

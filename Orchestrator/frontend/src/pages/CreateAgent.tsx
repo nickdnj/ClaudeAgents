@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2, Server, Mic, MicOff, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Server, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { agentsApi, mcpApi } from '../api/client';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 import useSWR from 'swr';
 
 export function CreateAgent() {
@@ -199,47 +200,23 @@ Describe what the agent produces.
                   <label className="block text-sm font-medium text-gray-700">
                     What should this agent do?
                   </label>
-                  {isSpeechSupported && (
-                    <button
-                      type="button"
-                      onClick={isListeningPrompt ? stopListeningPrompt : startListeningPrompt}
-                      disabled={isGenerating}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        isListeningPrompt
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      {isListeningPrompt ? (
-                        <>
-                          <MicOff className="h-4 w-4" />
-                          Stop
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="h-4 w-4" />
-                          Voice
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="relative">
-                  <textarea
-                    value={generatePrompt}
-                    onChange={(e) => setGeneratePrompt(e.target.value)}
-                    placeholder="Example: Create an agent that searches my Gmail for community updates from the past month, extracts key highlights, and compiles them into a progress report..."
-                    rows={4}
-                    className={`input resize-none bg-white ${isListeningPrompt ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                  <VoiceInputButton
+                    isListening={isListeningPrompt}
+                    isSupported={isSpeechSupported}
+                    onStart={startListeningPrompt}
+                    onStop={stopListeningPrompt}
                     disabled={isGenerating}
+                    size="sm"
                   />
-                  {isListeningPrompt && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
-                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      Listening...
-                    </div>
-                  )}
                 </div>
+                <textarea
+                  value={generatePrompt}
+                  onChange={(e) => setGeneratePrompt(e.target.value)}
+                  placeholder="Example: Create an agent that searches my Gmail for community updates from the past month, extracts key highlights, and compiles them into a progress report..."
+                  rows={4}
+                  className={`input resize-none bg-white ${isListeningPrompt ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                  disabled={isGenerating}
+                />
                 {speechErrorPrompt && (
                   <p className="mt-1 text-xs text-red-600">{speechErrorPrompt}</p>
                 )}
@@ -310,45 +287,21 @@ Describe what the agent produces.
                 <label className="block text-sm font-medium text-gray-700">
                   Description
                 </label>
-                {isSpeechSupported && (
-                  <button
-                    type="button"
-                    onClick={isListening ? stopListening : startListening}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      isListening
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {isListening ? (
-                      <>
-                        <MicOff className="h-4 w-4" />
-                        Stop
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="h-4 w-4" />
-                        Voice
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-              <div className="relative">
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe what this agent does..."
-                  rows={3}
-                  className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                <VoiceInputButton
+                  isListening={isListening}
+                  isSupported={isSpeechSupported}
+                  onStart={startListening}
+                  onStop={stopListening}
+                  size="sm"
                 />
-                {isListening && (
-                  <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
-                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                    Listening...
-                  </div>
-                )}
               </div>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe what this agent does..."
+                rows={3}
+                className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+              />
               {speechError && (
                 <p className="mt-1 text-xs text-red-600">{speechError}</p>
               )}

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Save, Server, Clock, History, Loader2, Code, Settings, Mic, MicOff } from 'lucide-react';
+import { ArrowLeft, Play, Save, Server, Clock, History, Loader2, Code, Settings } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { useAgent, useAgentHistory } from '../hooks/useAgents';
 import { agentsApi, mcpApi } from '../api/client';
 import { RunAgentModal } from '../components/agents/RunAgentModal';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { VoiceInputButton } from '../components/common/VoiceInputButton';
 import useSWR from 'swr';
 
 type Tab = 'edit' | 'advanced' | 'history';
@@ -273,45 +274,21 @@ export function AgentDetail() {
                   <label className="block text-sm font-medium text-gray-700">
                     Description
                   </label>
-                  {isSpeechSupported && (
-                    <button
-                      type="button"
-                      onClick={isListening ? stopListening : startListening}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                        isListening
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {isListening ? (
-                        <>
-                          <MicOff className="h-4 w-4" />
-                          Stop
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="h-4 w-4" />
-                          Voice
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="relative">
-                  <textarea
-                    value={description}
-                    onChange={(e) => { setDescription(e.target.value); setHasChanges(true); }}
-                    placeholder="Describe what this agent does..."
-                    rows={3}
-                    className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                  <VoiceInputButton
+                    isListening={isListening}
+                    isSupported={isSpeechSupported}
+                    onStart={startListening}
+                    onStop={stopListening}
+                    size="sm"
                   />
-                  {isListening && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
-                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      Listening...
-                    </div>
-                  )}
                 </div>
+                <textarea
+                  value={description}
+                  onChange={(e) => { setDescription(e.target.value); setHasChanges(true); }}
+                  placeholder="Describe what this agent does..."
+                  rows={3}
+                  className={`input resize-none ${isListening ? 'border-red-300 ring-2 ring-red-100' : ''}`}
+                />
                 {speechError && (
                   <p className="mt-1 text-xs text-red-600">{speechError}</p>
                 )}
