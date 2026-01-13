@@ -63,8 +63,14 @@ export interface MCPServer {
   name: string;
   command: string;
   args: string[];
-  status: string;
-  description: string;
+  env: Record<string, string>;
+  source?: 'user' | 'orchestrator';
+  description?: string;
+}
+
+export interface MCPTestResult {
+  success: boolean;
+  message: string;
 }
 
 export interface HealthStatus {
@@ -215,8 +221,37 @@ export const executionsApi = {
 
 // MCP Servers API
 export const mcpApi = {
-  list: () => request<MCPServer[]>('/api/mcp-servers'),
-  get: (name: string) => request<MCPServer>(`/api/mcp-servers/${encodeURIComponent(name)}`),
+  list: () => request<{ servers: MCPServer[] }>('/api/mcp/servers'),
+
+  get: (name: string) => request<MCPServer>(`/api/mcp/servers/${encodeURIComponent(name)}`),
+
+  create: (server: Omit<MCPServer, 'source' | 'description'>) =>
+    request<MCPServer>('/api/mcp/servers', {
+      method: 'POST',
+      body: JSON.stringify(server),
+    }),
+
+  update: (name: string, server: Omit<MCPServer, 'name' | 'source' | 'description'>) =>
+    request<MCPServer>(`/api/mcp/servers/${encodeURIComponent(name)}`, {
+      method: 'PUT',
+      body: JSON.stringify(server),
+    }),
+
+  delete: (name: string) =>
+    request<{ success: boolean }>(`/api/mcp/servers/${encodeURIComponent(name)}`, {
+      method: 'DELETE',
+    }),
+
+  copy: (name: string, newName: string) =>
+    request<MCPServer>(`/api/mcp/servers/${encodeURIComponent(name)}/copy`, {
+      method: 'POST',
+      body: JSON.stringify({ new_name: newName }),
+    }),
+
+  test: (name: string) =>
+    request<MCPTestResult>(`/api/mcp/servers/${encodeURIComponent(name)}/test`, {
+      method: 'POST',
+    }),
 };
 
 // Health API

@@ -44,7 +44,8 @@ export function AgentDetail() {
   const [showRunModal, setShowRunModal] = useState(searchParams.get('run') === 'true');
 
   // Fetch available MCP servers
-  const { data: mcpServers } = useSWR('/api/mcp-servers', () => mcpApi.list());
+  const { data: mcpData } = useSWR('/api/mcp/servers', () => mcpApi.list());
+  const mcpServers = mcpData?.servers;
 
   // Speech recognition for description
   const {
